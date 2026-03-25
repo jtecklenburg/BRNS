@@ -1,0 +1,205 @@
+# ======================================================================
+# BRNS Model Configuration - Multiple Species Example
+# ======================================================================
+# Converted from Maple example "Multiple_species_example.md"
+# Structured analogously to the Canfield YAML model.
+# ======================================================================
+
+metadata:
+  name: "Multiple Species Example"
+  description: "Five dissolved species with three kinetic reactions"
+  author: "P.A.G. Regnier / Jan Tecklenburg (Python port)"
+  version: "1.0"
+  date: "2026-03-24"
+  reference: "ACG Multiple Species Example"
+
+units:
+  L: cm
+  M: arbitrary
+  T: a
+
+output:
+  directory: "../generated_fortran/multiple_species_example"
+  prefix: "multiple_species"
+  timing:
+    start: 50.0
+    interval: 500.0
+
+structure:
+  nsolids: 0
+  ndissolved: 5
+  nreactions: 3
+  neqrxns: 0
+
+initial_conditions:
+  mode: 3
+
+species:
+  - name: "diss_a"
+    type: "dissolved"
+    description: "Species A"
+    output: true
+    output_filename: "diss_a"
+    bc_upper_type: 0
+    bc_upper_value: 1.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.63e-9
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "diss_b"
+    type: "dissolved"
+    description: "Species B"
+    output: true
+    output_filename: "diss_b"
+    bc_upper_type: 0
+    bc_upper_value: 1.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 1.89e-9
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "diss_c"
+    type: "dissolved"
+    description: "Species C"
+    output: true
+    output_filename: "diss_c"
+    bc_upper_type: 0
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 1.26e-9
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "diss_d"
+    type: "dissolved"
+    description: "Species D"
+    output: true
+    output_filename: "diss_d"
+    bc_upper_type: 0
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.63e-9
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "diss_e"
+    type: "dissolved"
+    description: "Species E"
+    output: true
+    output_filename: "diss_e"
+    bc_upper_type: 0
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.63e-9
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+parameters:
+  biogeochemical:
+    - name: "kreac1"
+      value: 1.0e-3
+      description: "Rate constant for reaction 1"
+    - name: "kreac2"
+      value: 1.0e-3
+      description: "Rate constant for reaction 2"
+    - name: "kdisol"
+      value: 1.0e-3
+      description: "Constant dissolution/source term"
+
+  stoichiometry: {}
+
+  physical:
+    al: 0.002
+    q0: 0.0
+    w0: 1.0e-4
+    Db0: 0.0
+    por0: 0.3
+    area0: 1.0
+    t_celsius: 0.1
+    salin: 0.1
+    delt: 10.0
+    depthmax: 0.1
+    endt: 1.0e4
+
+  physical_flags:
+    iq: 0
+    iw: 0
+    iDb: 0
+    ipor: 0
+    igrid: 0
+    iarea: 0
+
+grid:
+  nnodes: 51
+  type: 0
+
+reactions:
+  - id: 1
+    name: "reaction_1"
+    description: "Bimolecular reaction between diss_a and diss_b"
+    output: true
+    output_filename: "xrate1"
+    rate: "kreac1*diss_a*diss_b"
+    stoichiometry:
+      diss_a: -1
+      diss_b: -2
+      diss_c: 1
+
+  - id: 2
+    name: "reaction_2"
+    description: "Bimolecular reaction between diss_c and diss_d"
+    output: true
+    output_filename: "xrate2"
+    rate: "kreac2*diss_c*diss_d"
+    stoichiometry:
+      diss_c: -1
+      diss_d: -1
+      diss_e: 1
+
+  - id: 3
+    name: "reaction_3"
+    description: "Constant dissolution/source term for diss_d"
+    output: true
+    output_filename: "xrate3"
+    rate: "kdisol"
+    stoichiometry:
+      diss_d: 1
+
+advanced:
+  preprocessing:
+    gaussian_elimination: true
+    symbolic_simplification: true
+
+  equilibrium:
+    enabled: false
+    reactions: []
+
+  optimization:
+    enabled: false
+
+  listnotransp: []
+
+notes:
+  - "Converted from the Maple multiple-species example"
+  - "All species are dissolved; no solid species are present"
+  - "Initial-condition mode 3 uses per-species input files by default"
+  - "All species and all three reaction rates are configured for output"
+
+references:
+  - "ACG multiple-species example notebook/documentation"
+
+caveats:
+  - "All numeric values follow the Maple example directly"
+  - "Boundary conditions are Dirichlet at the top and Neumann at the bottom"
+  - "Species order is preserved exactly as defined here"

@@ -1,0 +1,908 @@
+# ======================================================================
+# BRNS Model Configuration - Canfield Diagenetic Model (Refactored)
+# ======================================================================
+# Restructured per request:
+# - Centralized units block
+# - Species contain boundary conditions, transport, and initial conditions
+# - Removed boundary_conditions, transport, initial_conditions blocks
+# - Removed input/output file names
+# ======================================================================
+
+metadata:
+  name: "Canfield Diagenetic Model"
+  description: "Full redox cascade with carbonate and sulfide chemistry"
+  author: "P.A.G. Regnier / Jan Tecklenburg (Python port)"
+  version: "1.2"
+  date: "2026-02-25"
+  reference: "Canfield (1993), NATO ASI Series"
+
+# ======================================================================
+# UNITS (centralized)
+# ======================================================================
+
+units:
+  L: m
+  M: g
+  T: a
+
+# ======================================================================
+# OUTPUT CONFIGURATION
+# ======================================================================
+
+output:
+  directory: "../generated_fortran/canfield"
+  prefix: "canfield"
+  timing:
+    start: 1.0
+    interval: 1.0
+
+# ======================================================================
+# MODEL STRUCTURE
+# ======================================================================
+
+structure:
+  nsolids: 6
+  ndissolved: 12
+  nreactions: 19
+  neqrxns: 3
+
+# ======================================================================
+# INITIAL CONDITIONS (global mode; Maple vic/ic semantics)
+# ======================================================================
+
+initial_conditions:
+  mode: 3
+
+# ======================================================================
+# SPECIES DEFINITIONS (boundary, transport, initial conditions included)
+# ======================================================================
+
+species:
+  # Species ordered as in Maple (indices 7, 11, 13, 16-18 are solids)
+  # 1-6: Dissolved
+  - name: "o2"
+    type: "dissolved"
+    description: "Dissolved oxygen"
+    output: true
+    output_filename: "o2"
+    bc_upper_type: 0
+    bc_upper_value: 132.0e-6
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 296.0
+    transport_alpha: 0.06
+    transport_tortuosity: 0.0
+    init_value: 180.0e-6
+
+  - name: "no3"
+    type: "dissolved"
+    description: "Nitrate"
+    output: true
+    output_filename: "no3"
+    bc_upper_type: 0
+    bc_upper_value: 17.3e-6
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 307.0
+    transport_alpha: 0.038
+    transport_tortuosity: 0.0
+    init_value: 30.0e-6
+
+  - name: "hco3"
+    type: "dissolved"
+    description: "Bicarbonate"
+    output: true
+    output_filename: "hco3"
+    bc_upper_type: 0
+    bc_upper_value: "C_hco3"
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 169.0
+    transport_alpha: 0.048
+    transport_tortuosity: 0.0
+    init_value: "C_hco3"
+
+  - name: "co3"
+    type: "dissolved"
+    description: "Carbonate"
+    output: true
+    output_filename: "co3"
+    bc_upper_type: 0
+    bc_upper_value: "C_co3"
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 137.0
+    transport_alpha: 0.047
+    transport_tortuosity: 0.0
+    init_value: "C_co3"
+
+  - name: "co2"
+    type: "dissolved"
+    description: "Dissolved CO2"
+    output: true
+    output_filename: "co2"
+    bc_upper_type: 0
+    bc_upper_value: "C_co2"
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 249.0
+    transport_alpha: 0.06
+    transport_tortuosity: 0.0
+    init_value: "C_co2"
+
+  - name: "hplus"
+    type: "dissolved"
+    description: "Hydrogen ion (pH)"
+    output: true
+    output_filename: "hplus"
+    bc_upper_type: 0
+    bc_upper_value: "hplus"
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 1769.0
+    transport_alpha: 0.026
+    transport_tortuosity: 0.0
+    init_value: "hplus"
+
+  # 7: Solid (ch2o)
+  - name: "ch2o"
+    type: "solid"
+    description: "Organic matter (CH2O stoichiometry)"
+    output: true
+    output_filename: "ch2o"
+    bc_upper_type: 2
+    bc_upper_value: "510.0e-6/s_dens"
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 7.0e-6
+
+  # 8-10: Dissolved
+  - name: "nh4"
+    type: "dissolved"
+    description: "Ammonium"
+    output: true
+    output_filename: "nh4"
+    bc_upper_type: 0
+    bc_upper_value: 1.0e-15
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 308.0
+    transport_alpha: 0.041
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "so4"
+    type: "dissolved"
+    description: "Sulfate"
+    output: true
+    output_filename: "so4"
+    bc_upper_type: 0
+    bc_upper_value: 28.0e-3
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 156.0
+    transport_alpha: 0.045
+    transport_tortuosity: 0.0
+    init_value: 28.0e-3
+
+  - name: "mn2"
+    type: "dissolved"
+    description: "Dissolved manganese (Mn2+)"
+    output: true
+    output_filename: "mn2"
+    bc_upper_type: 0
+    bc_upper_value: 1.0e-15
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 96.0
+    transport_alpha: 0.05
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  # 11: Solid (mno2)
+  - name: "mno2"
+    type: "solid"
+    description: "Manganese dioxide"
+    output: true
+    output_filename: "mno2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 4.0e-11
+
+  # 12: Dissolved
+  - name: "fe2"
+    type: "dissolved"
+    description: "Dissolved iron (Fe2+)"
+    output: true
+    output_filename: "fe2"
+    bc_upper_type: 0
+    bc_upper_value: 1.0e-15
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 106.0
+    transport_alpha: 0.044
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  # 13: Solid (feoh3)
+  - name: "feoh3"
+    type: "solid"
+    description: "Iron hydroxide"
+    output: true
+    output_filename: "feoh3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 1.0e-11
+
+  # 14-15: Dissolved
+  - name: "h2s"
+    type: "dissolved"
+    description: "Hydrogen sulfide"
+    output: true
+    output_filename: "h2s"
+    bc_upper_type: 0
+    bc_upper_value: 1.0e-15
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 258.0
+    transport_alpha: 0.06
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "hs"
+    type: "dissolved"
+    description: "Bisulfide"
+    output: true
+    output_filename: "hs"
+    bc_upper_type: 0
+    bc_upper_value: 1.0e-15
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 305.0
+    transport_alpha: 0.031
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  # 16-18: Solids
+  - name: "mnco3"
+    type: "solid"
+    description: "Manganese carbonate (rhodochrosite)"
+    output: true
+    output_filename: "mnco3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 0.06
+    transport_tortuosity: 0.0
+    init_value: 1.0e-20
+
+  - name: "feco3"
+    type: "solid"
+    description: "Iron carbonate (siderite)"
+    output: true
+    output_filename: "feco3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 0.06
+    transport_tortuosity: 0.0
+    init_value: 1.0e-20
+
+  - name: "fes"
+    type: "solid"
+    description: "Iron sulfide (mackinawite)"
+    output: true
+    output_filename: "fes"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 0.06
+    transport_tortuosity: 0.0
+    init_value: 1.0e-20
+
+# ======================================================================
+# BIOGEOCHEMICAL PARAMETERS (units removed)
+# ======================================================================
+
+parameters:
+  biogeochemical:
+    # Maple bio_name array (57 parameters in exact order)
+    - name: "kfox"
+      value: 0.221
+      description: "Organic matter degradation rate constant"
+    - name: "kmo2"
+      value: 8.0e-6
+      description: "O2 half-saturation constant"
+    - name: "ho2"
+      value: 0.0
+      description: "O2 inhibition factor (0=no inhibition)"
+    - name: "kmno3"
+      value: 10.0e-6
+      description: "NO3 half-saturation constant"
+    - name: "keq1"
+      value: "10^(-mlogkp1)"
+      description: "K1 carbonate equilibrium (CO2 + H2O <-> HCO3- + H+)"
+    - name: "keq2"
+      value: "10^(-mlogkp2)"
+      description: "K2 carbonate equilibrium (HCO3- <-> CO3-- + H+)"
+    - name: "keqcal"
+      value: "kcalc"
+      description: "Calcite solubility product"
+    - name: "calrate"
+      value: 5.0*365.0/100.0
+      description: "Calcite dissolution/precipitation rate constant"
+    - name: "nro"
+      value: 4.5
+      description: "Number of redox zones"
+    - name: "h1"
+      value: 1.0
+      description: "pH buffer factor (redox zone 1)"
+    - name: "knit"
+      value: 1.5e7
+      description: "Nitrification rate constant"
+    - name: "hno3"
+      value: 0.0
+      description: "NO3 inhibition factor"
+    - name: "kmno2"
+      value: 2.0e-6
+      description: "MnO2 half-saturation constant"
+    - name: "kmnox"
+      value: 2.0e9
+      description: "Mn(II) oxidation rate constant"
+    - name: "hmn4"
+      value: 0.0
+      description: "Mn(IV) inhibition factor"
+    - name: "kmfeoh3"
+      value: 5.0e-6
+      description: "Fe(OH)3 half-saturation constant"
+    - name: "kfeo2"
+      value: 2.0e9
+      description: "Fe(II) oxidation by O2 rate constant"
+    - name: "kfemno2"
+      value: 2.04e8
+      description: "Fe(II) oxidation by MnO2 rate constant"
+    - name: "hfe3"
+      value: 0.0
+      description: "Fe(III) inhibition factor"
+    - name: "kmso4"
+      value: 1.0e-3
+      description: "SO4 half-saturation constant"
+    - name: "hso4"
+      value: 0.0
+      description: "SO4 inhibition factor"
+    - name: "keqs"
+      value: "10^(-mlogkps)"
+      description: "Sulfide dissociation constant (H2S <-> HS- + H+)"
+    - name: "k14"
+      value: 6.0e8
+      description: "Sulfide oxidation by O2 rate constant"
+    - name: "k15"
+      value: 1.0e4
+      description: "Sulfide oxidation by MnO2 rate constant"
+    - name: "k16"
+      value: 1.0e4
+      description: "Sulfide oxidation by Fe(OH)3 rate constant"
+    - name: "hno3f2"
+      value: 0.0
+      description: "NO3 second inhibition factor"
+    - name: "hmn4f2"
+      value: 0.0
+      description: "Mn(IV) second inhibition factor"
+    - name: "hfe3f2"
+      value: 0.0
+      description: "Fe(III) second inhibition factor"
+    - name: "hso4f2"
+      value: 0.0
+      description: "SO4 second inhibition factor"
+    - name: "SD"
+      value: "s_dens*(1-por0)/por0*1000"
+      description: "Solid-to-dissolved conversion factor"
+    - name: "kfcarb"
+      value: 1.0
+      description: "Forward rate for CO2 + H2O -> HCO3- + H+"
+    - name: "kbcarb"
+      value: "keq1"
+      description: "Backward rate (= keq1)"
+    - name: "kfbcarb"
+      value: 1.0
+      description: "Forward rate for HCO3- -> CO3-- + H+"
+    - name: "kbbcarb"
+      value: "keq2"
+      description: "Backward rate (= keq2)"
+    - name: "kfs"
+      value: 1.0
+      description: "Forward rate for H2S -> HS- + H+"
+    - name: "kbs"
+      value: "keqs"
+      description: "Backward rate (= keqs)"
+    - name: "alph0"
+      value: 283.0
+      description: "pH dependency coefficient for adsorption"
+    - name: "kn_s"
+      value: 1.4
+      description: "NH4 adsorption rate constant"
+    - name: "kmn_s"
+      value: 10.0**2.7
+      description: "Mn adsorption rate constant"
+    - name: "kfe_s"
+      value: 10.0**3.5
+      description: "Fe adsorption rate constant"
+    - name: "st"
+      value: 30.0*1.0e-6
+      description: "Adsorption site density"
+    - name: "gamma_s"
+      value: 0.14
+      description: "Adsorption cooperativity parameter"
+    - name: "K_mnco3"
+      value: 10.0**(-8.5)
+      description: "MnCO3 solubility product"
+    - name: "K_feco3"
+      value: 10.0**(-8.4)
+      description: "FeCO3 solubility product"
+    - name: "K_fes"
+      value: 10.0**(-2.2)
+      description: "FeS solubility product"
+    - name: "k17_1"
+      value: 1.02e-6
+      description: "MnCO3 precipitation rate constant"
+    - name: "k17_2"
+      value: 2.5e-1
+      description: "MnCO3 dissolution rate constant"
+    - name: "k18_1"
+      value: 1.02e-6
+      description: "FeCO3 precipitation rate constant"
+    - name: "k18_2"
+      value: 2.5e-1
+      description: "FeCO3 dissolution rate constant"
+    - name: "k19_1"
+      value: 5.1e-6
+      description: "FeS precipitation rate constant"
+    - name: "k19_2"
+      value: 1.0e-3
+      description: "FeS dissolution rate constant"
+    - name: "sw17"
+      value: 1
+      description: "Switch for MnCO3 precipitation (1=kinetic, 0=dissolution)"
+    - name: "sw18"
+      value: 1
+      description: "Switch for FeCO3 precipitation (1=kinetic, 0=dissolution)"
+    - name: "sw19"
+      value: 1
+      description: "Switch for FeS precipitation (1=kinetic, 0=dissolution)"
+    - name: "k20"
+      value: 2.2e7
+      description: "FeS oxidation by O2 rate constant"
+    - name: "sd_fe"
+      value: 9.3e-3*110.0
+      description: "Fe(OH)3 molar mass × conversion"
+    - name: "sd_mn"
+      value: 23.0e-3*87.0
+      description: "MnO2 molar mass × conversion"
+
+  # Stoichiometry coefficients (from Maple: x, y, z, s_dens)
+  stoichiometry:
+    x: 200.0
+    y: 21.0
+    z: 0.0
+    s_dens: 2.5
+
+  physical:
+    al: 1.0e-5
+    q0: 0.0
+    w0: 0.398
+    Db0: 27.5
+    por0: 0.85
+    area0: 1.0
+    t_celsius: 10.3
+    salin: 35.0
+    delt: 1.0e-7
+    depthmax: 50.0
+    endt: 5.0
+
+  physical_flags:
+    iq: 0
+    iw: 0
+    iDb: 1
+    ipor: 0
+    igrid: 1
+    iarea: 0
+
+# ======================================================================
+# GRID CONFIGURATION
+# ======================================================================
+
+grid:
+  nnodes: 111
+  type: 1
+
+# ======================================================================
+# REACTION NETWORK
+# ======================================================================
+
+reactions:
+  # PRIMARY REDOX REACTIONS
+  - id: 1
+    name: "aerobic_respiration"
+    description: "Organic matter oxidation by O2"
+    output: true
+    output_filename: "oxid"
+    rate: "kch2o * fo2"
+    rate_components:
+      kch2o: "kfox * ch2o"
+      fo2: "ho2 + (1.0 - ho2)*(o2/kmo2)"
+    stoichiometry:
+      ch2o: -1
+      o2: "- SD*(x+2*y)/x"
+      no3: "SD*(y/x)"
+      co2: "(x+y+2*z)/x * SD"
+      hco3: "- (y+2*z)/x * SD"
+
+  - id: 2
+    name: "denitrification"
+    description: "Organic matter oxidation by NO3"
+    output: true
+    output_filename: "deni"
+    rate: "kch2o * fno3"
+    rate_components:
+      fno3: "hno3*(1-fo2)*(hno3f2 + (1.0 - hno3f2)*(no3/kmno3))"
+    stoichiometry:
+      ch2o: -1
+      no3: "- (4*x + 3*y)/(5*x) * SD"
+      co2: "(x-3*y+10*z)/(5*x) * SD"
+      hco3: "(4*x+3*y-10*z)/(5*x) * SD"
+
+  - id: 6
+    name: "sulfate_reduction"
+    description: "Organic matter oxidation by SO4"
+    output: true
+    output_filename: "sulf"
+    rate: "fso4 * kch2o"
+    rate_components:
+      fso4: "hso4*(1-fo2-fno3-fmn4-ffe3)*(hso4f2 + (1.0 - hso4f2)*so4/kmso4)"
+    stoichiometry:
+      ch2o: -1
+      so4: "- SD/2"
+      h2s: "SD/2"
+      co2: "-(y-2*z)*SD/x"
+      hco3: "(x+y-2*z)*SD/x"
+      nh4: "(y/x)*SD"
+
+  - id: 7
+    name: "nitrification"
+    description: "Ammonium oxidation by O2"
+    output: true
+    output_filename: "nit"
+    rate: "knit*nh4*o2"
+    stoichiometry:
+      nh4: -1
+      o2: -2
+      no3: 1
+      co2: 2
+      hco3: -2
+
+  - id: 8
+    name: "manganese_reduction"
+    description: "Organic matter oxidation by MnO2"
+    output: true
+    output_filename: "mnred"
+    rate: "fmn4*kch2o"
+    rate_components:
+      fmn4: "hmn4*(1-fo2-fno3)*(hmn4f2 + (1.0 - hmn4f2)*(mno2/kmno2))"
+    stoichiometry:
+      ch2o: -1
+      mno2: -2
+      mn2: "2*SD"
+      co2: "- (3*x+y-2*z)*SD/x"
+      hco3: "(4*x+y-2*z)*SD/x"
+      nh4: "(y/x)*SD"
+
+  - id: 9
+    name: "manganese_oxidation"
+    description: "Mn(II) oxidation by O2"
+    output: true
+    output_filename: "mnox"
+    rate: "kmnox*mn2*o2"
+    stoichiometry:
+      mn2: -1
+      o2: "-1/2"
+      mno2: "1/SD"
+      co2: 2
+      hco3: -2
+
+  - id: 10
+    name: "iron_reduction"
+    description: "Organic matter oxidation by Fe(OH)3"
+    output: true
+    output_filename: "fered"
+    rate: "kch2o*ffe3"
+    rate_components:
+      ffe3: "hfe3*(1-fo2-fno3-fmn4)*(hfe3f2 + (1.0 - hfe3f2)*feoh3/kmfeoh3)"
+    stoichiometry:
+      ch2o: -1
+      feoh3: -4
+      fe2: "4*SD"
+      co2: "- (7*x+y-2*z)*SD/x"
+      hco3: "(8*x+y-2*z)*SD/x"
+      nh4: "(y/x)*SD"
+
+  - id: 11
+    name: "iron_oxidation_o2"
+    description: "Fe(II) oxidation by O2"
+    output: true
+    output_filename: "feoxo2"
+    rate: "kfeo2*fe2*o2"
+    stoichiometry:
+      fe2: -1
+      o2: "-1/4"
+      feoh3: "1/SD"
+      co2: 2
+      hco3: -2
+
+  - id: 12
+    name: "iron_oxidation_mno2"
+    description: "Fe(II) oxidation by MnO2"
+    output: true
+    output_filename: "feoxmno2"
+    rate: "kfemno2*fe2*mno2"
+    stoichiometry:
+      fe2: "- 2*SD"
+      mno2: -1
+      mn2: "SD"
+      feoh3: "2"
+      co2: "2*SD"
+      hco3: "- 2*SD"
+
+  # CARBONATE SYSTEM EQUILIBRIA
+  - id: 3
+    name: "carbonate_equilibrium_1"
+    description: "CO2 + H2O <-> HCO3- + H+"
+    equilibrium: true
+    rate: "F3 - B3"
+    rate_components:
+      F3: "kfcarb * hplus * hco3"
+      B3: "kbcarb * co2"
+    equilibrium_constraint: "hplus * hco3 - keq1 * co2"
+    stoichiometry:
+      co2: 1
+      hco3: -1
+      hplus: -1
+
+  - id: 4
+    name: "carbonate_equilibrium_2"
+    description: "HCO3- <-> CO3-- + H+"
+    equilibrium: true
+    rate: "F4 - B4"
+    rate_components:
+      F4: "kfbcarb * hplus * co3"
+      B4: "kbbcarb * hco3"
+    equilibrium_constraint: "hplus * co3 - keq2 * hco3"
+    stoichiometry:
+      hco3: 1
+      co3: -1
+      hplus: -1
+
+  # SULFIDE EQUILIBRIUM
+  - id: 13
+    name: "sulfide_dissociation"
+    description: "H2S <-> HS- + H+"
+    equilibrium: true
+    rate: "F13 - B13"
+    rate_components:
+      F13: "kfs * hplus * hs"
+      B13: "kbs * h2s"
+    equilibrium_constraint: "hplus * hs - keqs * h2s"
+    stoichiometry:
+      h2s: 1
+      hs: -1
+      hplus: -1
+
+  # SULFIDE RE-OXIDATION
+  - id: 14
+    name: "sulfide_oxidation_o2"
+    description: "Sulfide oxidation by O2"
+    output: true
+    output_filename: "h2sox1"
+    rate: "k14*o2*(hs + h2s)"
+    stoichiometry:
+      o2: -2
+      h2s: -1
+      so4: 1
+      co2: 2
+      hco3: -2
+
+  - id: 15
+    name: "sulfide_oxidation_mno2"
+    description: "Sulfide oxidation by MnO2"
+    output: true
+    output_filename: "h2sox2"
+    rate: "k15*mno2*(hs + h2s)"
+    stoichiometry:
+      mno2: -1
+      h2s: "- SD"
+      mn2: "SD"
+      co2: "- 2*SD"
+      hco3: "2*SD"
+
+  - id: 16
+    name: "sulfide_oxidation_feoh3"
+    description: "Sulfide oxidation by Fe(OH)3"
+    output: true
+    output_filename: "h2sox3"
+    rate: "k16*feoh3*(hs + h2s)"
+    stoichiometry:
+      feoh3: -2
+      h2s: "- SD"
+      fe2: "2*SD"
+      co2: "- 4*SD"
+      hco3: "4*SD"
+
+  # MINERAL PRECIPITATION/DISSOLUTION
+  - id: 17
+    name: "mnco3_precipitation"
+    description: "MnCO3 precipitation/dissolution"
+    output: true
+    output_filename: "xrate17"
+    rate: "(k17_1*sw17 + k17_2*mnco3*(1-sw17))*(omega_mn-1)"
+    rate_components:
+      omega_mn: "mn2*co3/K_mnco3"
+      sw17: 1
+    stoichiometry:
+      mn2: "- SD"
+      mnco3: 1
+      co2: "SD"
+      hco3: "- 2*SD"
+
+  - id: 18
+    name: "feco3_precipitation"
+    description: "FeCO3 precipitation/dissolution"
+    output: true
+    output_filename: "xrate18"
+    rate: "(k18_1*sw18 + k18_2*feco3*(1-sw18))*(omega_fe-1)"
+    rate_components:
+      omega_fe: "fe2*co3/K_feco3"
+      sw18: 1
+    stoichiometry:
+      fe2: "- SD"
+      feco3: 1
+      co2: "SD"
+      hco3: "- 2*SD"
+
+  - id: 19
+    name: "fes_precipitation"
+    description: "FeS precipitation/dissolution"
+    output: true
+    output_filename: "xrate19"
+    rate: "(k19_1*sw19 + k19_2*fes*(1-sw19))*(omega_fes-1)"
+    rate_components:
+      omega_fes: "fe2*hs/(hplus*K_fes)"
+      sw19: 1
+    stoichiometry:
+      fe2: "- SD"
+      h2s: "- SD"
+      fes: 1
+      co2: "2*SD"
+      hco3: "- 2*SD"
+
+  # FeS RE-OXIDATION
+  - id: 5
+    name: "fes_oxidation"
+    description: "FeS oxidation by O2"
+    output: true
+    output_filename: "xrate5"
+    rate: "k20*fes*o2"
+    stoichiometry:
+      fes: -1
+      o2: "- 2*SD"
+      fe2: "SD"
+      so4: "SD"
+
+# ======================================================================
+# ADVANCED OPTIONS
+# ======================================================================
+
+advanced:
+  preprocessing:
+    gaussian_elimination: true
+    symbolic_simplification: true
+
+  equilibrium:
+    enabled: true
+    reactions: [3, 4, 13]
+    solver: "algebraic"
+
+  optimization:
+    enabled: false
+
+  # switches: not used - sw17/sw18/sw19 are constant parameters (value=1) as in Maple reference
+
+# ======================================================================
+# COMPUTATIONAL FORMULAS (for reference)
+# ======================================================================
+
+computed_values:
+  description: "These values are computed from other parameters"
+
+  environmental_conditions:
+    T_C: "t_celsius"
+    S: "salin"
+    T: "T_C + 273.15"
+
+  carbonate_system:
+    alk: 2.4e-3
+    ph: 8.1
+    mlogk1: "-126.3405 + 6320.81/T + 45.057*log10(T)"
+    mlogk2: "-90.1833 + 5143.69/T + 33.648*log10(T)"
+    mlogkp1: "-13.7201 + 0.031334*T + 3235.67/T + 1.3e-5*S*T - 0.1032*sqrt(S)"
+    mlogkp2: "5371.9645 + 1.671221*T + 0.22913*S + 18.3802*log10(S) - 128375.28/T - 2194.3055*log10(T) - 8.0944e-4*S*T - 5617.11*log10(S)/T + 2.136*S/T"
+    k1: "10^(-mlogkp1)"
+    k2: "10^(-mlogkp2)"
+    hplus: "1.0*10^(-ph)"
+    alpha0: "1/(1 + (k1/hplus) + (k1*k2/hplus^2.0))"
+    alpha1: "1/((hplus/k1) + 1 + (k2/hplus))"
+    alpha2: "1/((hplus^2.0/(k1*k2)) + (hplus/k2) + 1.0)"
+    CT: "alk/(alpha1 + 2*alpha2)"
+    C_co2: "CT * alpha0"
+    C_hco3: "CT * alpha1"
+    C_co3: "CT * alpha2"
+
+  sulfide_system:
+    mlogkps: "2.527 + 1359.96/T - 0.206*S^(1/3)"
+    ks: "10^(-mlogkps)"
+
+  calcite_solubility:
+    thermo_cal: "-171.9065 - 0.077993*T + 2839.319/T + 71.595*log10(T)"
+    mlogkcalc: "ln(10^thermo_cal) + (-1.78938 + 6.5453e-3*T + 410.64/T)*S^0.5 - 0.17755*S + 9.4979e-3*S^1.5"
+    kcalc_base: "exp(mlogkcalc)"
+    delv: "-48.76 + 0.5304*T_C"
+    delk: "-1.0e-3 * (11.76 - 0.3692*T_C)"
+    R: 83.144
+    P: 400
+    Kratio: "exp((-delv*P/(R*T)) + (0.5*delk*P^2/(R*T)))"
+    kcalc: "kcalc_base * Kratio"
+
+  diffusion:
+    formula: "D(T,sal) = [(0.95 - 0.001*sal) * D0 * (1 + alpha*T_C)] / (1 - ln(por^2))"
+
+# ======================================================================
+# NOTES AND REFERENCES
+# ======================================================================
+
+notes:
+  - "This model implements the full Canfield diagenetic redox cascade"
+  - "Equilibrium reactions (3, 4, 13) are solved algebraically"
+  - "Mineral precipitation/dissolution uses saturation state (omega)"
+  - "Switch variables (sw17, sw18, sw19) control precip vs. diss kinetics"
+  - "Organic matter stoichiometry: (CH2O)200(NH3)21"
+  - "Temperature-dependent equilibrium constants from Millero (1995)"
+  - "Pressure correction for calcite solubility included"
+
+references:
+  - "Canfield, D.E. (1993) Organic Matter Oxidation in Marine Sediments"
+  - "Millero, F.J. (1995) Thermodynamics of the carbon dioxide system in the oceans"
+  - "Regnier et al. (2011) Quantitative analysis of anaerobic oxidation of methane"
+
+caveats:
+  - "For real numbers in Maple, always add decimal point (e.g., 1.0 not 1)"
+  - "All units must be consistent throughout"
+  - "Solid-to-dissolved conversion requires SD = s_dens*(1-por)/por*1000"
+  - "Porosity must be referenced EXACTLY as 'por(j)' in Maple formulas"
+  - "User-specified profiles (q, w, Db) must be implemented in Fortran subroutines"

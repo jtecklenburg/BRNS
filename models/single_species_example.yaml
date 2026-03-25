@@ -1,0 +1,121 @@
+# ======================================================================
+# BRNS Model Configuration - Single Species Example
+# ======================================================================
+# Converted from Maple example "Single_species_example.md"
+# Structured analogously to the Canfield YAML model.
+# ======================================================================
+
+metadata:
+  name: "Single Species Example"
+  description: "One dissolved species with one first-order degradation reaction"
+  author: "P.A.G. Regnier / Jan Tecklenburg (Python port)"
+  version: "1.0"
+  date: "2026-03-24"
+  reference: "ACG Single Species Example"
+
+units:
+  L: cm
+  M: arbitrary
+  T: a
+
+output:
+  directory: "../generated_fortran/single_species_example"
+  prefix: "single_species"
+  timing:
+    start: 50.0
+    interval: 500.0
+
+structure:
+  nsolids: 0
+  ndissolved: 1
+  nreactions: 1
+  neqrxns: 0
+
+initial_conditions:
+  mode: 3
+
+species:
+  - name: "diss_a"
+    type: "dissolved"
+    description: "Single dissolved species"
+    output: true
+    output_filename: "diss_a"
+    bc_upper_type: 0
+    bc_upper_value: 1.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    transport_D0: 0.63e-9
+    transport_alpha: 0.0
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+parameters:
+  biogeochemical:
+    - name: "k_deg"
+      value: 1.0e-3
+      description: "First-order degradation rate constant"
+
+  stoichiometry: {}
+
+  physical:
+    al: 0.01
+    q0: 0.0
+    w0: 1.0e-4
+    Db0: 0.0
+    por0: 0.3
+    area0: 1.0
+    t_celsius: 0.1
+    salin: 0.1
+    delt: 10.0
+    depthmax: 0.1
+    endt: 1.0e4
+
+  physical_flags:
+    iq: 0
+    iw: 0
+    iDb: 0
+    ipor: 0
+    igrid: 0
+    iarea: 0
+
+grid:
+  nnodes: 51
+  type: 0
+
+reactions:
+  - id: 1
+    name: "first_order_degradation"
+    description: "First-order degradation of diss_a"
+    output: true
+    output_filename: "rate_a"
+    rate: "k_deg*diss_a"
+    stoichiometry:
+      diss_a: -1
+
+advanced:
+  preprocessing:
+    gaussian_elimination: true
+    symbolic_simplification: true
+
+  equilibrium:
+    enabled: false
+    reactions: []
+
+  optimization:
+    enabled: false
+
+  listnotransp: []
+
+notes:
+  - "Converted from the Maple single-species example"
+  - "One dissolved species and one kinetic reaction"
+  - "Initial-condition mode 3 uses a per-species input file by default"
+  - "Species and reaction rate are both configured for output"
+
+references:
+  - "ACG single-species example notebook/documentation"
+
+caveats:
+  - "All numeric values follow the Maple example directly"
+  - "Boundary conditions are Dirichlet at the top and Neumann at the bottom"
+  - "Species order is preserved exactly as defined here"

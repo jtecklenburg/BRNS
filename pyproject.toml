@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "acg-brns"
+version = "0.1.0"
+description = "Automatic Code Generation for BRNS - Generate Fortran code from symbolic models"
+readme = "README.md"
+authors = [
+    {name = "BRNS Development Team", email = "info@example.com"}
+]
+license = {text = "MIT"}
+requires-python = ">=3.8"
+dependencies = [
+    "sympy>=1.12",
+    "numpy>=1.20"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Code Generators"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "flake8>=6.0"
+]
+notebooks = [
+    "jupyter>=1.0",
+    "matplotlib>=3.5",
+    "ipykernel>=6.0"
+]
+
+[project.urls]
+Homepage = "https://github.com/jtecklenburg/thermooptiplan"
+Repository = "https://github.com/jtecklenburg/thermooptiplan"
+
+[tool.setuptools]
+packages = ["acg_brns"]
+
+[tool.setuptools.package-data]
+acg_brns = ["*.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]

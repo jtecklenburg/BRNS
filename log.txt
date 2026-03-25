@@ -1,0 +1,178 @@
+==========================================
+BRNS Build: Referenz-Version (Maple)
+==========================================
+
+[0;32m✓[0m gfortran gefunden: GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
+
+Erstelle Build-Verzeichnis...
+
+Kopiere Framework-Dateien...
+Kopiere generierte Referenz-Dateien (free format)...
+Dateien im Build-Verzeichnis:
+GAMMP.F
+LUBKSB.F
+LUDCMP.F
+MPROVE.F
+NEWT.F
+TRIDAG.F
+advdiffcoeff.f
+basic.f
+biogeo.f
+boundaries.f
+common.inc
+common_drive.inc
+common_geo.inc
+common_meas.inc
+common_opt.inc
+defines.inc
+diagenesis.f
+drivervalues.f
+eigen.f
+frngdb.f
+funk.f
+gaussj.f
+getdat.f
+getdelt.f
+gridsetup.f
+initialcond.f
+interpolate.f
+issolid.f
+jacobian.f
+limits.f
+main.f
+molecular.f
+newtonsub.f
+notransport.f
+objf.f
+optima.f
+optimde.f
+optimlm.f
+optimsa.f
+output.f
+parameters.f
+porarea.f
+printdepth.f
+printsvnversion.f
+printsvnversion_nosvn.f
+printsvnversion_tmpl.f
+rates.f
+readbiogeo.f
+residual.f
+ssrates.f
+steadystate.f
+storedat.f
+switches.f
+timestep.f
+timestep.inc
+transcoeff-MT.f
+transcoeff.f
+transferback.f
+transferfw.f
+transport.f
+
+Kompiliere...
+advdiffcoeff.f:79:72:
+
+   79 |               pause 'hit any key to continue'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+drivervalues.f:100:72:
+
+  100 |            pause
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+drivervalues.f:105:72:
+
+  105 |              pause
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+drivervalues.f:109:72:
+
+  109 |            pause
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+eigen.f:177:72:
+
+  177 |                 IF(ITER.EQ.itmax)PAUSE 'too many iterations'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+frngdb.f:14:72:
+
+   14 |  1    AA(J)=RANX(J)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 1 at (1)
+frngdb.f:59:72:
+
+   59 |  12      U(J+J-2)=0
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 12 at (1)
+frngdb.f:68:72:
+
+   68 |  16         U(J+1)=U(J)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 16 at (1)
+frngdb.f:80:72:
+
+   80 |  20      RANX(J+KK-LL)=U(J)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 20 at (1)
+frngdb.f:82:72:
+
+   82 |  21      RANX(J-LL)=U(J)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 21 at (1)
+frngdb.f:84:72:
+
+   84 |  22      CALL RNFARR(U,KKK)
+      |                                                                        1
+Warning: Fortran 2018 deleted feature: DO termination statement which is not END DO or CONTINUE with label 22 at (1)
+gaussj.f:24:72:
+
+   24 |                  pause 'singular matrix in gaussj 1'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+gaussj.f:44:72:
+
+   44 |          if (a(icol,icol).eq.0.d0) pause 'singular matrix in gaussj 2'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+interpolate.f:161:72:
+
+  161 |        if (h.eq.0.) pause 'bad xa input in splint'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+optimde.f:344:18:
+
+  344 |            do i=1,Dim_XC
+      |                  1
+Warning: Deleted feature: End expression in DO loop at (1) must be integer
+optimde.f:377:50:
+
+  377 |       write(3,*) 'best par: ', (bestmem_XC(i),i=1,Dim_XC)
+      |                                                  1
+Warning: Deleted feature: End expression in DO loop at (1) must be integer
+optimde.f:378:60:
+
+  378 |        write(*,*) 'best OF&par', bestval,(bestmem_XC(i),i=1,Dim_XC)
+      |                                                            1
+Warning: Deleted feature: End expression in DO loop at (1) must be integer
+LUDCMP.F:32:72:
+
+   32 |              pause ! stop
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+TRIDAG.F:13:72:
+
+   13 |        IF(B1(1).EQ.0.d0)PAUSE 'Crashed where b1(1)=0'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+TRIDAG.F:19:72:
+
+   19 |          IF(BET.EQ.0.d0)PAUSE 'Crashed where BET=0'
+      |                                                                        1
+Warning: Deleted feature: PAUSE statement at (1)
+
+[0;32m✓ Referenz-Executable erfolgreich erstellt[0m
+-rwxrwxrwx 1 tecklenburg tecklenburg 274K Dec 17 17:12 brns_reference
+
+Executable: /mnt/c/Tecklenburg.J/work/thermooptiplan/BRNSPackage/build/reference/brns_reference
