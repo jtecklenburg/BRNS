@@ -107,7 +107,6 @@ c  because I don't want to exclude this it is repeated here            *
 c***********************************************************************
       call basic()
       call biogeo()
-c      call readbiogeo()  !MT 15.05.2017
       call molecular()
      
       call gridsetup()
@@ -117,13 +116,6 @@ c      call readbiogeo()  !MT 15.05.2017
 
       call boundaries()
       call initialcond()
-c      call biogeo()
-cc     do jj=1,nx,2
-cc 3011     format(200(1x,e14.7))
-cc      write(232,3011) (sp(i,jj), i=1,ncomp)
-cc      write(*,3011) (sp(i,jj), i=1,ncomp)
-cc     pause
-cc      end do
 
 c***********************************************************************
 c  FINAL RUN                                                           *
