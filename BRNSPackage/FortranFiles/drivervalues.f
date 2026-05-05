@@ -8,7 +8,6 @@ c                                                                      *
 c     CM, Spring 2002                                                  *
 c***********************************************************************
          include 'common_geo.inc'
-         include 'common_opt.inc'
          include 'common_drive.inc'
 
 c***********************************************************************
@@ -128,43 +127,6 @@ c***********************************************************************
         write(*,*) 'isol set to 1'
         isol = 1
       end if
-
-c***********************************************************************
-c      optimization parameters                                         *
-c      iopt: selects optimization routine                              *
-c            0: simplex downhill                                       *
-c            1: levenberg-marquardt                                    *
-c            2: simulated annealing                                    *
-c            3: differential evolution (genetic algorithm family)      *
-c      optftol: defines optimization stop criterion: delt_of/magnitude *
-c      problim: probability to accept a wrong model (stop criterium)   *
-c      perturb: perturbation of vertices: p = p*(1+perturb)            *
-c               for LM (iopt=1), this should be rather small (0.01)    *
-c               for DS & SA (iopt=0,2), 0.1 seems ok                   *
-c      itmax: maximum number of iterations in optimization             *
-c      iof: selects type of objective function (objf.f)                *
-c           0: weighting by average of measured profile                *
-c           1: weighting by uncertainty (std.dev)                      *
-c      relsig: relative error: std.dev = relsig*Cmeas                  *
-c      stdmin: minimum error in Cmeas                                  *
-c      ngtzero: if 1, then parameters are forced to be > 0             *
-c                                                                      *
-c      NOTE: there are some local switches in                          *
-c       optimsa (cooling schedule: ncool, alphatemp)                   *
-c       optimde (crossover probabilities, range, a.s.o)                *
-c***********************************************************************
-        iopt = 3
-        optftol =10.d0**(-9.d0)
-        problim = 0.001d0
-       perturb = 0.1d0
-       itmax = nopt*50
-       iof = 1
-       relsig = 0.01d0
-       stdmin = 10.0d0**(-6.d0)
-       ngtzero=0
-
-       ! obj.function must be related to std.dev in LM
-       if (iopt.eq.1) iof = 1
 
         return
        end

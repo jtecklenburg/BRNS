@@ -14,8 +14,6 @@ c  July 2002, CM                                                       *
 c***********************************************************************
       include 'common_geo.inc'
       include 'common.inc'
-      include 'common_opt.inc'
-      include 'common_meas.inc'
       include 'common_drive.inc'
 c***********************************************************************
 c  some explanations for variables defined in common blocks            *
@@ -126,69 +124,6 @@ cc      write(232,3011) (sp(i,jj), i=1,ncomp)
 cc      write(*,3011) (sp(i,jj), i=1,ncomp)
 cc     pause
 cc      end do
-c***********************************************************************
-c  START OF OPTIMIZATION                                               *
-c     nopt = number of parameters to be optimized (Maple)              *
-c            if nopt=0 bypass optimization and go for "final" run      *
-c     transferfw: put all the parameters into an array called par      *
-c     storedat: get the measured data the calculations are compared to *
-c       -> getdata: filenames with data (Maple)                        *
-c     optima: optimization of parameters using the downhill-simplex    *
-c       -> funk: calculation of the objective function                 *
-c           -> transferback: update parameters with the values in par  *
-c           -> diagenesis: Pierre's core code (see below)              *
-c           -> objf: calculates the objective function                 *
-c              -> interpolation: interpolate calculated conc. to the   *
-c                 measurements                                         *
-c                  -> spline,splint: done with splines (Press et al.)  *
-c       -> amoeba: simplex downhill optimization (see Press et al.)    *
-c           -> amotry: part of amoeba                                  *
-c              -> funk ...                                             *
-c           -> funk     ...                                            *
-c              -> transferback                                         *
-c     optimlm: optimization of parameters using levenberg-marquardt    *
-c           -> objf: -> interpolation: -> spline&splint                *
-c     optftol: stopping criterium. details of use see amoeba & optimlm *
-c                                                                      *
-c     CM, Spring 2002                                                  *
-c***********************************************************************
-!!c     if (nopt.gt.0) then
-      if (idoopt.eq.1) then
-
-c***********************************************************************
-c      TRANSFERFW: transfer maple & forward code parameters into a     *
-c      generic list, called par                                        *
-c      this list should contain all the parameters from common_geo.inc *
-c      i.e. all rate parameters and all transport parameters           *
-c      but not delt and delxi                                          *
-c***********************************************************************
-        call transferfw()
-
-c***********************************************************************
-c      STOREDAT: obtain the measured data                              *
-c      read in the measured data in storedat.f                         *
-c       the required format is described in the comments in storedat.f *
-c      names of files containing measured data are listed in           *
-c       the subroutine getdat.f, which is generated from within maple  *
-c       and called from storedat                                       *
-c                                                                      *
-c      CM, Dec 2001                                                    *
-c***********************************************************************
-         call storedat()
-
-c***********************************************************************
-c      open file for output of the development of the objective        *
-c      function and the parameter values, as they change along the way *
-c      and do the optimization                                         *
-c***********************************************************************
-         open(unit=3,file='OF&par-values.dat',status='unknown')
-        write(3,*) 'objective function & values of optimized parameters'
-        if (iopt.eq.0) call optima()
-        if (iopt.eq.1) call optimlm()
-        if (iopt.eq.2) call optimsa()
-         if (iopt.eq.3) call optimde()
-        close(3)
-      end if
 
 c***********************************************************************
 c  FINAL RUN                                                           *
@@ -199,8 +134,6 @@ c***********************************************************************
       tstart = 0.d0
       tend = endt
        ntopt2 = 1
-c     if ((ntopt.gt.0).and.(nopt.gt.0)) ntopt2 = ntopt
-      if (idoopt.eq.1) ntopt2 = ntopt
 
 c***********************************************************************
 c  PRINT FINAL RUN                                                     *
@@ -212,8 +145,6 @@ c***********************************************************************
  3001     format(200(1x,e14.7))
 
       do ii=1,ntopt2
-c        if ((ntopt.gt.0).and.(nopt.gt.0)) tend = timemeas(ii)
-         if (idoopt.eq.1) tend = timemeas(ii)
          if ((tend.eq.0.).and.(nsstate.ne.1)) write(*,*) 'tend=0!'
         if (nsstate.eq.1) write(5,*) 'steady state, C(x), R(x)'
         if (nsstate.eq.2) write(5,*) 'steady state &transient C(x),R(x)'
