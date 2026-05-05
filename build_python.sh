@@ -36,7 +36,8 @@ INPUT_DIR=""
 OUTPUT_DIR="./build_output"
 MODEL_NAME=""
 FORTRAN_COMMON="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/BRNSPackage/FortranFiles"
-FFLAGS="-cpp -I. -O2 -finit-local-zero -fno-unsafe-math-optimizations -fPIC -g"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FFLAGS="-cpp -I. -O2 -finit-local-zero -fno-unsafe-math-optimizations -fPIC -g -Wall -Wextra -Wuninitialized"
 LIBS="-llapack -lblas"
 
 # ==========================================
@@ -99,6 +100,7 @@ fi
 
 YAML_CONFIG="$(cd "$(dirname "$YAML_CONFIG")" && pwd)/$(basename "$YAML_CONFIG")"
 INPUT_DIR="$(cd "$(dirname "$INPUT_DIR")" && pwd)/$(basename "$INPUT_DIR")"
+OUTPUT_DIR="$(mkdir -p "$OUTPUT_DIR" && cd "$OUTPUT_DIR" && pwd)"
 
 if [ -z "$MODEL_NAME" ]; then
     MODEL_NAME=$(basename "$YAML_CONFIG" .yaml | tr '[:upper:]' '[:lower:]')
@@ -182,11 +184,13 @@ echo "Running Python code generator..."
 python3 -c "
 import sys
 sys.path.insert(0, '$(dirname "$YAML_CONFIG")')
+sys.path.insert(0, '$SCRIPT_DIR')
 
 from acg_brns.acg_orchestrator import ACGOrchestrator
 
 try:
-    orchestrator = ACGOrchestrator('$YAML_CONFIG')
+    orchestrator = ACGOrchestrator('$YAML_CONFIG', '.')
+    orchestrator.load_config()
     print(f'✓ Loaded YAML: {orchestrator.config.get(\"model_name\", \"unknown\")}')
     
     orchestrator.evaluate_formulas()
@@ -198,7 +202,7 @@ try:
     orchestrator.run_preprocessing()
     print('✓ Preprocessing completed')
     
-    orchestrator.run_code_generation(output_dir='.')
+    orchestrator.run_code_generation()
     print('✓ Fortran code generated')
     
 except Exception as e:
@@ -257,7 +261,7 @@ CORE_SOURCES=(
     issolid.f jacobian.f limits.f rates.f residual.f ssrates.f steadystate.f switches.f output.f
     notransport.f getdelt.f timestep.f transport.f transcoeff.f transcoeff-MT.f
     gaussj.f LUBKSB.F LUDCMP.F MPROVE.F NEWT.F newtonsub.f TRIDAG.F
-    parameters.f printdepth.f printsvnversion.f readbiogeo.f
+    parameters.f printdepth.f printsvnversion.f
 )
 
 COMPILE_SOURCES=()

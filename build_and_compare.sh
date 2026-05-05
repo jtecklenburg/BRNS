@@ -242,7 +242,7 @@ build_version() {
         issolid.f jacobian.f limits.f rates.f residual.f ssrates.f steadystate.f switches.f output.f
         notransport.f getdelt.f timestep.f transport.f transcoeff.f transcoeff-MT.f
         gaussj.f LUBKSB.F LUDCMP.F MPROVE.F NEWT.F newtonsub.f TRIDAG.F
-        parameters.f printdepth.f printsvnversion.f readbiogeo.f
+        parameters.f printdepth.f printsvnversion.f
     )
 
     COMPILE_SOURCES=()
@@ -478,24 +478,38 @@ if [ ! -d "$REFERENCE_GEN" ]; then
 fi
 
 case "$ACTION" in
-    build|all)
+    all)
         [ "$SKIP_REF" = false ] && build_version "Reference" "$REFERENCE_GEN" "$BUILD_REF" "brns_reference"
         build_version "Python" "$PYTHON_GEN" "$BUILD_PY" "brns_python" || exit 1
-        ;;&
-    
-    run|all)
+
         [ "$SKIP_REF" = false ] && run_version "Reference" "$BUILD_REF" "brns_reference" "$RESULTS_DIR/reference"
         run_version "Python" "$BUILD_PY" "brns_python" "$RESULTS_DIR/python" || exit 1
-        ;;&
-    
-    compare|all)
+
         if [ "$SKIP_REF" = false ]; then
             compare_results
         else
             echo -e "${YELLOW}Comparison not possible (no reference)${NC}"
         fi
         ;;
-    
+
+    build)
+        [ "$SKIP_REF" = false ] && build_version "Reference" "$REFERENCE_GEN" "$BUILD_REF" "brns_reference"
+        build_version "Python" "$PYTHON_GEN" "$BUILD_PY" "brns_python" || exit 1
+        ;;
+
+    run)
+        [ "$SKIP_REF" = false ] && run_version "Reference" "$BUILD_REF" "brns_reference" "$RESULTS_DIR/reference"
+        run_version "Python" "$BUILD_PY" "brns_python" "$RESULTS_DIR/python" || exit 1
+        ;;
+
+    compare)
+        if [ "$SKIP_REF" = false ]; then
+            compare_results
+        else
+            echo -e "${YELLOW}Comparison not possible (no reference)${NC}"
+        fi
+        ;;
+
     *)
         echo -e "${RED}Unknown action: $ACTION${NC}"
         echo "Allowed: all, build, run, compare"
