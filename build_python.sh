@@ -249,6 +249,29 @@ done
 
 rm -f printsvnversion_nosvn.f printsvnversion_tmpl.f 2>/dev/null || true
 
+# Compile only the forward-model source set (no optimization files)
+CORE_SOURCES=(
+    main.f
+    basic.f biogeo.f boundaries.f drivervalues.f diagenesis.f
+    advdiffcoeff.f gridsetup.f porarea.f molecular.f initialcond.f
+    issolid.f jacobian.f limits.f rates.f residual.f ssrates.f steadystate.f switches.f output.f
+    notransport.f getdelt.f timestep.f transport.f transcoeff.f transcoeff-MT.f
+    gaussj.f LUBKSB.F LUDCMP.F MPROVE.F NEWT.F newtonsub.f TRIDAG.F
+    parameters.f printdepth.f printsvnversion.f readbiogeo.f
+)
+
+COMPILE_SOURCES=()
+for src in "${CORE_SOURCES[@]}"; do
+    if [ -f "$src" ]; then
+        COMPILE_SOURCES+=("$src")
+    fi
+done
+
+if [ ${#COMPILE_SOURCES[@]} -eq 0 ]; then
+    echo -e "${RED}ERROR: No Fortran sources selected for compilation!${NC}"
+    exit 1
+fi
+
 echo ""
 
 # ==========================================
@@ -264,9 +287,10 @@ EXEC="brns_python"
 
 echo "Compiling $EXEC..."
 echo "FFLAGS: $FFLAGS"
+echo "Source files: ${#COMPILE_SOURCES[@]}"
 echo ""
 
-gfortran $FFLAGS *.f *.F -o "$EXEC" $LIBS 2>&1 | tee compile.log
+gfortran $FFLAGS "${COMPILE_SOURCES[@]}" -o "$EXEC" $LIBS 2>&1 | tee compile.log
 COMPILE_STATUS=${PIPESTATUS[0]}
 
 if [ $COMPILE_STATUS -eq 0 ] && [ -f "$EXEC" ]; then

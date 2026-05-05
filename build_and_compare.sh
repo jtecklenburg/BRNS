@@ -186,14 +186,17 @@ build_version() {
     cp "$FORTRAN_COMMON"/*.F . 2>/dev/null || true
     cp "$FORTRAN_COMMON"/*.inc . 2>/dev/null || true
 
-    # Model-specific files from reference (gridsetup.f, advdiffcoeff.f, porarea.f, etc.)
-    # override generic FortranFiles variants, so e.g. gridsetup.f
-    # uses the correct starting point x(1)=0 (not AquaDiva x(1)=-18).
-    if [ -d "$REFERENCE_GEN" ]; then
-        echo "Copying model-specific files from reference..."
-        cp "$REFERENCE_GEN"/*.f . 2>/dev/null || true
-        cp "$REFERENCE_GEN"/*.F . 2>/dev/null || true
-        cp "$REFERENCE_GEN"/*.inc . 2>/dev/null || true
+    # Model-specific overrides from reference for Python build only
+    # (keeps reference branch unchanged and avoids pulling optimization files into Python compile set)
+    if [ "$VERSION" = "Python" ] && [ -d "$REFERENCE_GEN" ]; then
+        echo "Copying selected model-specific overrides from reference..."
+        REFERENCE_OVERRIDES=(gridsetup.f advdiffcoeff.f porarea.f transcoeff.f transcoeff-MT.f)
+        for ref_src in "${REFERENCE_OVERRIDES[@]}"; do
+            if [ -f "$REFERENCE_GEN/$ref_src" ]; then
+                cp "$REFERENCE_GEN/$ref_src" .
+                echo "  ✓ override: $ref_src"
+            fi
+        done
     fi
     
     echo "Copying generated files..."
@@ -230,14 +233,38 @@ build_version() {
     done
     
     rm -f printsvnversion_nosvn.f printsvnversion_tmpl.f 2>/dev/null || true
+
+    # Compile only the forward-model source set (no optimization files)
+    CORE_SOURCES=(
+        main.f
+        basic.f biogeo.f boundaries.f drivervalues.f diagenesis.f
+        advdiffcoeff.f gridsetup.f porarea.f molecular.f initialcond.f
+        issolid.f jacobian.f limits.f rates.f residual.f ssrates.f steadystate.f switches.f output.f
+        notransport.f getdelt.f timestep.f transport.f transcoeff.f transcoeff-MT.f
+        gaussj.f LUBKSB.F LUDCMP.F MPROVE.F NEWT.F newtonsub.f TRIDAG.F
+        parameters.f printdepth.f printsvnversion.f readbiogeo.f
+    )
+
+    COMPILE_SOURCES=()
+    for src in "${CORE_SOURCES[@]}"; do
+        if [ -f "$src" ]; then
+            COMPILE_SOURCES+=("$src")
+        fi
+    done
+
+    if [ ${#COMPILE_SOURCES[@]} -eq 0 ]; then
+        echo -e "${RED}ERROR: No Fortran sources selected for compilation!${NC}"
+        return 1
+    fi
     
     echo ""
     echo "Compiling $EXEC..."
     echo "FFLAGS: $FFLAGS"
+    echo "Source files: ${#COMPILE_SOURCES[@]}"
     echo ""
     
     # Compile and save exit code correctly (not overridden by tee)
-    gfortran $FFLAGS *.f *.F -o "$EXEC" $LIBS 2>&1 | tee compile.log
+    gfortran $FFLAGS "${COMPILE_SOURCES[@]}" -o "$EXEC" $LIBS 2>&1 | tee compile.log
     local COMPILE_STATUS=${PIPESTATUS[0]}
     
     # Check both exit code and if executable exists
