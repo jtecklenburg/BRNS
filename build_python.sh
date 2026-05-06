@@ -1,18 +1,19 @@
 #!/bin/bash
 #
 # Simple build and run script for Python-generated BRNS code
-# User-configurable: YAML config path, input files path, output directory
+# User-configurable: YAML config path, optional input files path, output directory
 #
-# Usage: ./build_python.sh -c YAML_CONFIG -i INPUT_DIR [-o OUTPUT_DIR] [-n NAME]
-#   -c YAML_CONFIG    Path to YAML configuration file (required)
-#   -i INPUT_DIR      Directory containing input files (.inp) (required)
+# Usage: ./build_python.sh -c YAML_CONFIG_OR_MODEL_DIR [-i INPUT_DIR] [-o OUTPUT_DIR] [-n NAME]
+#   -c YAML_CONFIG_OR_MODEL_DIR  Path to YAML file, model directory, or model name under ./models (required)
+#   -i INPUT_DIR                 Directory containing input files (.inp) (default: YAML/model directory)
 #   -o OUTPUT_DIR     Output directory for generated code (default: ./build_output)
 #   -n NAME           Output name/identifier (default: derived from YAML filename)
 #   -h                Show this help message
 #
 # Examples:
-#   ./build_python.sh -c ./configs/mymodel.yaml -i ./inputs
-#   ./build_python.sh -c ./configs/mymodel.yaml -i ./inputs -o ./my_build -n mymodel_v2
+#   ./build_python.sh -c ./models/single_species/single_species_example.yaml
+#   ./build_python.sh -c ./models/multiple_species
+#   ./build_python.sh -c equilibrium -o ./my_build -n eq_v2
 #
 
 set -e
@@ -78,15 +79,31 @@ if [ -z "$YAML_CONFIG" ]; then
     exit 1
 fi
 
-if [ -z "$INPUT_DIR" ]; then
-    echo -e "${RED}ERROR: Input directory (-i) is required!${NC}"
-    echo "Use -h for help"
-    exit 1
+# Allow shorthand model name from ./models
+if [ ! -e "$YAML_CONFIG" ] && [ -d "$SCRIPT_DIR/models/$YAML_CONFIG" ]; then
+    YAML_CONFIG="$SCRIPT_DIR/models/$YAML_CONFIG"
+fi
+
+# If -c points to a model directory, pick YAML from that directory
+if [ -d "$YAML_CONFIG" ]; then
+    mapfile -t YAML_CANDIDATES < <(find "$YAML_CONFIG" -maxdepth 1 -name "*.yaml" -type f | sort)
+    if [ ${#YAML_CANDIDATES[@]} -eq 0 ]; then
+        echo -e "${RED}ERROR: No YAML file found in model directory: $YAML_CONFIG${NC}"
+        exit 1
+    fi
+    if [ ${#YAML_CANDIDATES[@]} -gt 1 ]; then
+        echo -e "${YELLOW}Warning: Multiple YAML files found in $YAML_CONFIG, using first: ${YAML_CANDIDATES[0]}${NC}"
+    fi
+    YAML_CONFIG="${YAML_CANDIDATES[0]}"
 fi
 
 if [ ! -f "$YAML_CONFIG" ]; then
     echo -e "${RED}ERROR: YAML config file not found: $YAML_CONFIG${NC}"
     exit 1
+fi
+
+if [ -z "$INPUT_DIR" ]; then
+    INPUT_DIR="$(dirname "$YAML_CONFIG")"
 fi
 
 if [ ! -d "$INPUT_DIR" ]; then

@@ -99,17 +99,11 @@ fi
 
 REFERENCE_GEN="$SCRIPT_DIR/reference_fortran/$EXAMPLE"
 PYTHON_GEN="$SCRIPT_DIR/generated_fortran/$EXAMPLE"
+MODEL_DIR="$SCRIPT_DIR/models/$EXAMPLE"
 BUILD_BASE="$SCRIPT_DIR/build/$EXAMPLE"
 BUILD_REF="$BUILD_BASE/reference"
 BUILD_PY="$BUILD_BASE/python"
 RESULTS_DIR="$BUILD_BASE/results"
-NOTEBOOKS_BASE="$SCRIPT_DIR/maple/notebooks"
-NOTEBOOKS_EXAMPLE="$NOTEBOOKS_BASE/$EXAMPLE"
-if [ -d "$NOTEBOOKS_EXAMPLE" ]; then
-    NOTEBOOKS_INPUT_DIR="$NOTEBOOKS_EXAMPLE"
-else
-    NOTEBOOKS_INPUT_DIR="$NOTEBOOKS_BASE"
-fi
 
 # ==========================================
 # Auto-detect input files
@@ -117,7 +111,7 @@ fi
 
 detect_input_files() {
     local search_dirs=(
-        "$NOTEBOOKS_INPUT_DIR"
+        "$MODEL_DIR"
         "$REFERENCE_GEN"
         "$PYTHON_GEN"
     )
@@ -152,6 +146,7 @@ echo "BRNS Build & Run: $EXAMPLE"
 echo "=========================================="
 echo ""
 echo -e "${CYAN}Example:${NC}        $EXAMPLE"
+echo -e "${CYAN}Model dir:${NC}      $MODEL_DIR"
 echo -e "${CYAN}Python-Gen:${NC}     $PYTHON_GEN"
 echo -e "${CYAN}Reference:${NC}      $REFERENCE_GEN"
 echo -e "${CYAN}Input files:${NC}    ${#INPUT_FILES[@]} found"
@@ -215,11 +210,11 @@ build_version() {
     
     echo "Copying input files (${#INPUT_FILES[@]})..."
     for inp in "${INPUT_FILES[@]}"; do
-        if [ -f "$NOTEBOOKS_INPUT_DIR/$inp" ]; then
-            cp "$NOTEBOOKS_INPUT_DIR/$inp" .
-            echo "  ✓ $inp: $NOTEBOOKS_INPUT_DIR/$inp -> $TARGET/$inp"
+        if [ -f "$MODEL_DIR/$inp" ]; then
+            cp "$MODEL_DIR/$inp" .
+            echo "  ✓ $inp: $MODEL_DIR/$inp -> $TARGET/$inp"
         else
-            # Fallbacks if not present in notebooks
+            # Fallbacks if not present in models
             if [ -f "$REFERENCE_GEN/$inp" ]; then
                 cp "$REFERENCE_GEN/$inp" .
                 echo "  ⚠ $inp (fallback): $REFERENCE_GEN/$inp -> $TARGET/$inp"
@@ -306,11 +301,11 @@ run_version() {
     
     echo "Copying fresh input files..."
     for inp in "${INPUT_FILES[@]}"; do
-        if [ -f "$NOTEBOOKS_INPUT_DIR/$inp" ]; then
-            cp "$NOTEBOOKS_INPUT_DIR/$inp" .
-            echo "  ✓ $inp: $NOTEBOOKS_INPUT_DIR/$inp -> $BUILDDIR/$inp"
+        if [ -f "$MODEL_DIR/$inp" ]; then
+            cp "$MODEL_DIR/$inp" .
+            echo "  ✓ $inp: $MODEL_DIR/$inp -> $BUILDDIR/$inp"
         else
-            # Fallbacks if not present in notebooks
+            # Fallbacks if not present in models
             if [ -f "$REFERENCE_GEN/$inp" ]; then
                 cp "$REFERENCE_GEN/$inp" .
                 echo "  ⚠ $inp (fallback): $REFERENCE_GEN/$inp -> $BUILDDIR/$inp"
