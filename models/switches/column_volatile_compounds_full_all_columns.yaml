@@ -1,0 +1,1176 @@
+﻿# ======================================================================
+# BRNS Model Configuration - Column Volatile Compounds (All Columns)
+# ======================================================================
+# Converted from maple/notebooks/switches/Column_volatile_compounds-full-all_columns.md
+# using skill dev_docs/skills/md_to_brns_yaml_skill.md
+# ======================================================================
+
+metadata:
+  name: "Column Volatile Compounds - Full All Columns"
+  description: "Multi-column volatile compounds model with 41 species and 41 reactions"
+  author: "P.A.G. Regnier / Jan Tecklenburg (Python port)"
+  version: "1.0"
+  date: "2026-05-13"
+  reference: "Column_volatile_compounds-full-all_columns"
+
+units:
+  L: cm
+  M: arbitrary
+  T: a
+
+output:
+  directory: "../generated_fortran/switches"
+  prefix: "column_volatile_compounds"
+  timing:
+    start: 12.
+    interval: 12.
+
+structure:
+  nsolids: 31
+  ndissolved: 10
+  nreactions: 41
+  neqrxns: 0
+
+initial_conditions:
+  mode: 3
+
+species:
+  - name: "t_stamp"
+    type: "solid"
+    description: "Species 1"
+    output: true
+    output_filename: "t_stamp"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 0.0
+
+  - name: "tol_h_g_LC"
+    type: "dissolved"
+    description: "Species 2"
+    output: true
+    output_filename: "tol_h_g_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 297.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_g_LC"
+    type: "dissolved"
+    description: "Species 3"
+    output: true
+    output_filename: "tol_d_g_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 294.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_l_LC"
+    type: "solid"
+    description: "Species 4"
+    output: true
+    output_filename: "tol_h_l_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_l_LC"
+    type: "solid"
+    description: "Species 5"
+    output: true
+    output_filename: "tol_d_l_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_res_LC"
+    type: "solid"
+    description: "Species 6"
+    output: true
+    output_filename: "tol_h_res_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 15.5
+
+  - name: "tol_d_res_LC"
+    type: "solid"
+    description: "Species 7"
+    output: true
+    output_filename: "tol_d_res_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 15.5
+
+  - name: "tol_h_head_LC"
+    type: "solid"
+    description: "Species 8"
+    output: true
+    output_filename: "tol_h_head_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_head_LC"
+    type: "solid"
+    description: "Species 9"
+    output: true
+    output_filename: "tol_d_head_LC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_g_HC"
+    type: "dissolved"
+    description: "Species 10"
+    output: true
+    output_filename: "tol_h_g_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 297.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_g_HC"
+    type: "dissolved"
+    description: "Species 11"
+    output: true
+    output_filename: "tol_d_g_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 294.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_l_HC"
+    type: "solid"
+    description: "Species 12"
+    output: true
+    output_filename: "tol_h_l_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_l_HC"
+    type: "solid"
+    description: "Species 13"
+    output: true
+    output_filename: "tol_d_l_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_res_HC"
+    type: "solid"
+    description: "Species 14"
+    output: true
+    output_filename: "tol_h_res_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 17.4
+
+  - name: "tol_d_res_HC"
+    type: "solid"
+    description: "Species 15"
+    output: true
+    output_filename: "tol_d_res_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 17.4
+
+  - name: "tol_h_head_HC"
+    type: "solid"
+    description: "Species 16"
+    output: true
+    output_filename: "tol_h_head_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_head_HC"
+    type: "solid"
+    description: "Species 17"
+    output: true
+    output_filename: "tol_d_head_HC"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_g_B1"
+    type: "dissolved"
+    description: "Species 18"
+    output: true
+    output_filename: "tol_h_g_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 297.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_g_B1"
+    type: "dissolved"
+    description: "Species 19"
+    output: true
+    output_filename: "tol_d_g_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 294.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_l_B1"
+    type: "solid"
+    description: "Species 20"
+    output: true
+    output_filename: "tol_h_l_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_l_B1"
+    type: "solid"
+    description: "Species 21"
+    output: true
+    output_filename: "tol_d_l_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_res_B1"
+    type: "solid"
+    description: "Species 22"
+    output: true
+    output_filename: "tol_h_res_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 17.4
+
+  - name: "tol_d_res_B1"
+    type: "solid"
+    description: "Species 23"
+    output: true
+    output_filename: "tol_d_res_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 17.4
+
+  - name: "tol_h_head_B1"
+    type: "solid"
+    description: "Species 24"
+    output: true
+    output_filename: "tol_h_head_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_head_B1"
+    type: "solid"
+    description: "Species 25"
+    output: true
+    output_filename: "tol_d_head_B1"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_g_B2"
+    type: "dissolved"
+    description: "Species 26"
+    output: true
+    output_filename: "tol_h_g_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 297.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_g_B2"
+    type: "dissolved"
+    description: "Species 27"
+    output: true
+    output_filename: "tol_d_g_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 294.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_l_B2"
+    type: "solid"
+    description: "Species 28"
+    output: true
+    output_filename: "tol_h_l_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_l_B2"
+    type: "solid"
+    description: "Species 29"
+    output: true
+    output_filename: "tol_d_l_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_res_B2"
+    type: "solid"
+    description: "Species 30"
+    output: true
+    output_filename: "tol_h_res_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 17.4
+
+  - name: "tol_d_res_B2"
+    type: "solid"
+    description: "Species 31"
+    output: true
+    output_filename: "tol_d_res_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 17.4
+
+  - name: "tol_h_head_B2"
+    type: "solid"
+    description: "Species 32"
+    output: true
+    output_filename: "tol_h_head_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_head_B2"
+    type: "solid"
+    description: "Species 33"
+    output: true
+    output_filename: "tol_d_head_B2"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_g_B3"
+    type: "dissolved"
+    description: "Species 34"
+    output: true
+    output_filename: "tol_h_g_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 297.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_g_B3"
+    type: "dissolved"
+    description: "Species 35"
+    output: true
+    output_filename: "tol_d_g_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 0
+    bc_lower_value: 1.0e-6
+    transport_D0: 294.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_l_B3"
+    type: "solid"
+    description: "Species 36"
+    output: true
+    output_filename: "tol_h_l_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1.0e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_l_B3"
+    type: "solid"
+    description: "Species 37"
+    output: true
+    output_filename: "tol_d_l_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_h_res_B3"
+    type: "solid"
+    description: "Species 38"
+    output: true
+    output_filename: "tol_h_res_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 32.0
+
+  - name: "tol_d_res_B3"
+    type: "solid"
+    description: "Species 39"
+    output: true
+    output_filename: "tol_d_res_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 32.0
+
+  - name: "tol_h_head_B3"
+    type: "solid"
+    description: "Species 40"
+    output: true
+    output_filename: "tol_h_head_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+  - name: "tol_d_head_B3"
+    type: "solid"
+    description: "Species 41"
+    output: true
+    output_filename: "tol_d_head_B3"
+    bc_upper_type: 2
+    bc_upper_value: 0.0
+    bc_lower_type: 2
+    bc_lower_value: 0.0
+    transport_D0: 0.0
+    transport_alpha: 1e-10
+    transport_tortuosity: 0.0
+    init_value: 1.0e-6
+
+parameters:
+  biogeochemical:
+    - name: "sw1"
+      value: 1
+      description: "From Maple bio_name/bio_val"
+    - name: "sw2"
+      value: 1
+      description: "From Maple bio_name/bio_val"
+    - name: "alpha_tol_b"
+      value: 0.05
+      description: "From Maple bio_name/bio_val"
+    - name: "alph_diff_g"
+      value: 0.990
+      description: "From Maple bio_name/bio_val"
+    - name: "alpha_ex"
+      value: 1.0
+      description: "From Maple bio_name/bio_val"
+    - name: "alpha_res"
+      value: 1.0
+      description: "From Maple bio_name/bio_val"
+    - name: "alpha_head"
+      value: 1.0
+      description: "From Maple bio_name/bio_val"
+    - name: "Ks"
+      value: 0.5
+      description: "From Maple bio_name/bio_val"
+    - name: "H_h"
+      value: 0.30
+      description: "From Maple bio_name/bio_val"
+    - name: "H_d"
+      value: 0.30
+      description: "From Maple bio_name/bio_val"
+    - name: "volfact_pore0"
+      value: "86.0/14.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "volfact_pore"
+      value: "volfact_pore0"
+      description: "From Maple bio_name/bio_val"
+    - name: "vol_g"
+      value: "Pi*2.05^2*0.5*por0/1000.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "vol_head0"
+      value: 0.045
+      description: "From Maple bio_name/bio_val"
+    - name: "vol_head"
+      value: "vol_head0"
+      description: "From Maple bio_name/bio_val"
+    - name: "vol_res0"
+      value: 2.375
+      description: "From Maple bio_name/bio_val"
+    - name: "vol_res"
+      value: "vol_res0"
+      description: "From Maple bio_name/bio_val"
+    - name: "dry_fact"
+      value: "7.0/14.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "dec_l"
+      value: 5.0
+      description: "From Maple bio_name/bio_val"
+    - name: "t_ref"
+      value: 168.0
+      description: "From Maple bio_name/bio_val"
+    - name: "kmax"
+      value: "74.82*0.3"
+      description: "From Maple helper parameter"
+    - name: "k_exch"
+      value: 100.0
+      description: "From Maple helper parameter"
+    - name: "k_exch_res"
+      value: 0.1
+      description: "From Maple helper parameter"
+    - name: "k_exch_head"
+      value: 100.0
+      description: "From Maple helper parameter"
+    - name: "dec_t"
+      value: 0.010
+      description: "From Maple helper parameter"
+    - name: "kmax_l_LC"
+      value: "kmax*volfact_pore0*0.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_LC"
+      value: "k_exch"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_res_LC"
+      value: "k_exch_res"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_head_LC"
+      value: "k_exch_head"
+      description: "From Maple bio_name/bio_val"
+    - name: "dec_t_LC"
+      value: "dec_t"
+      description: "From Maple bio_name/bio_val"
+    - name: "kmax_l_HC"
+      value: "kmax*volfact_pore0*0.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_HC"
+      value: "k_exch"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_res_HC"
+      value: "k_exch_res"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_head_HC"
+      value: "k_exch_head"
+      description: "From Maple bio_name/bio_val"
+    - name: "dec_t_HC"
+      value: "dec_t"
+      description: "From Maple bio_name/bio_val"
+    - name: "kmax_l_B1"
+      value: "kmax*volfact_pore0*1.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_B1"
+      value: "k_exch"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_res_B1"
+      value: "k_exch_res"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_head_B1"
+      value: "k_exch_head"
+      description: "From Maple bio_name/bio_val"
+    - name: "dec_t_B1"
+      value: "dec_t"
+      description: "From Maple bio_name/bio_val"
+    - name: "kmax_l_B2"
+      value: "kmax*volfact_pore0*1.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_B2"
+      value: "k_exch"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_res_B2"
+      value: "k_exch_res"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_head_B2"
+      value: "k_exch_head"
+      description: "From Maple bio_name/bio_val"
+    - name: "dec_t_B2"
+      value: "dec_t"
+      description: "From Maple bio_name/bio_val"
+    - name: "kmax_l_B3"
+      value: "kmax*volfact_pore0*1.0"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_B3"
+      value: "k_exch"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_res_B3"
+      value: "k_exch_res"
+      description: "From Maple bio_name/bio_val"
+    - name: "k_exch_head_B3"
+      value: "k_exch_head"
+      description: "From Maple bio_name/bio_val"
+    - name: "dec_t_B3"
+      value: "dec_t"
+      description: "From Maple bio_name/bio_val"
+
+  physical:
+    al: 0.0
+    q0: 0.
+    w0: 0.0
+    Db0: 0.0
+    por0: "0.39*0.86"
+    area0: 1.0
+    t_celsius: 23.
+    salin: 1.0e-10
+    T: "T_C + 273.15"
+    delt: "0.005/10.0"
+    depthmax: 35.0
+    endt: 192.
+
+  physical_flags:
+    iq: 0
+    iw: 0
+    iDb: 0
+    ipor: 0
+    igrid: 0
+    iarea: 0
+
+grid:
+  nnodes: 71
+  type: 0
+
+reactions:
+  - id: 1
+    name: "reaction_1"
+    description: "Rate law 1 from Maple"
+    output: true
+    output_filename: "xrate1"
+    rate: 1.0
+    stoichiometry:
+      t_stamp: 1
+  - id: 2
+    name: "reaction_2"
+    description: "Rate law 2 from Maple"
+    output: true
+    output_filename: "xrate2"
+    rate: "k_exch_LC*(tol_h_g_LC-tol_h_l_LC*H_h)*sw1"
+    stoichiometry:
+      tol_h_g_LC: -1
+      tol_h_l_LC: "volfact_pore"
+  - id: 3
+    name: "reaction_3"
+    description: "Rate law 3 from Maple"
+    output: true
+    output_filename: "xrate3"
+    rate: "k_exch_LC*alpha_ex*(tol_d_g_LC-tol_d_l_LC*H_d)*sw1"
+    stoichiometry:
+      tol_d_g_LC: -1
+      tol_d_l_LC: "volfact_pore"
+  - id: 4
+    name: "reaction_4"
+    description: "Rate law 4 from Maple"
+    output: true
+    output_filename: "xrate4"
+    rate: "kmax_l_LC*exp(-dec_t_LC*t_stamp)*tol_h_l_LC/(Ks+tol_h_l_LC+tol_d_l_LC*alpha_tol_b)*sw1"
+    stoichiometry:
+      tol_h_l_LC: -1
+  - id: 5
+    name: "reaction_5"
+    description: "Rate law 5 from Maple"
+    output: true
+    output_filename: "xrate5"
+    rate: "kmax_l_LC*exp(-dec_t_LC*t_stamp)*tol_d_l_LC/(Ks/alpha_tol_b+tol_h_l_LC/alpha_tol_b+tol_d_l_LC)*sw1"
+    stoichiometry:
+      tol_d_l_LC: -1
+  - id: 6
+    name: "reaction_6"
+    description: "Rate law 6 from Maple"
+    output: true
+    output_filename: "xrate6"
+    rate: "k_exch_res_LC*(tol_h_head_LC-tol_h_res_LC*H_h)*sw2"
+    stoichiometry:
+      tol_h_head_LC: "-1/vol_head"
+      tol_h_res_LC: "1/vol_res"
+  - id: 7
+    name: "reaction_7"
+    description: "Rate law 7 from Maple"
+    output: true
+    output_filename: "xrate7"
+    rate: "k_exch_res_LC*alpha_res*(tol_d_head_LC-tol_d_res_LC*H_d)*sw2"
+    stoichiometry:
+      tol_d_head_LC: "-1/vol_head"
+      tol_d_res_LC: "1/vol_res"
+  - id: 8
+    name: "reaction_8"
+    description: "Rate law 8 from Maple"
+    output: true
+    output_filename: "xrate8"
+    rate: "k_exch_head_LC*(tol_h_g_LC-tol_h_head_LC)*sw2"
+    stoichiometry:
+      tol_h_g_LC: "-1/vol_g"
+      tol_h_head_LC: "1/vol_head"
+  - id: 9
+    name: "reaction_9"
+    description: "Rate law 9 from Maple"
+    output: true
+    output_filename: "xrate9"
+    rate: "k_exch_head_LC*alpha_head*(tol_d_g_LC-tol_d_head_LC)*sw2"
+    stoichiometry:
+      tol_d_g_LC: "-1/vol_g"
+      tol_d_head_LC: "1/vol_head"
+  - id: 10
+    name: "reaction_10"
+    description: "Rate law 10 from Maple"
+    output: true
+    output_filename: "xrate10"
+    rate: "k_exch_HC*(tol_h_g_HC-tol_h_l_HC*H_h)*sw1"
+    stoichiometry:
+      tol_h_g_HC: -1
+      tol_h_l_HC: "volfact_pore"
+  - id: 11
+    name: "reaction_11"
+    description: "Rate law 11 from Maple"
+    output: true
+    output_filename: "xrate11"
+    rate: "k_exch_HC*alpha_ex*(tol_d_g_HC-tol_d_l_HC*H_d)*sw1"
+    stoichiometry:
+      tol_d_g_HC: -1
+      tol_d_l_HC: "volfact_pore"
+  - id: 12
+    name: "reaction_12"
+    description: "Rate law 12 from Maple"
+    output: true
+    output_filename: "xrate12"
+    rate: "kmax_l_HC*exp(-dec_t_HC*t_stamp)*tol_h_l_HC/(Ks+tol_h_l_HC+tol_d_l_HC*alpha_tol_b)*sw1"
+    stoichiometry:
+      tol_h_l_HC: -1
+  - id: 13
+    name: "reaction_13"
+    description: "Rate law 13 from Maple"
+    output: true
+    output_filename: "xrate13"
+    rate: "kmax_l_HC*exp(-dec_t_HC*t_stamp)*tol_d_l_HC/(Ks/alpha_tol_b+tol_h_l_HC/alpha_tol_b+tol_d_l_HC)*sw1"
+    stoichiometry:
+      tol_d_l_HC: -1
+  - id: 14
+    name: "reaction_14"
+    description: "Rate law 14 from Maple"
+    output: true
+    output_filename: "xrate14"
+    rate: "k_exch_res_HC*(tol_h_head_HC-tol_h_res_HC*H_h)*sw2"
+    stoichiometry:
+      tol_h_head_HC: "-1/vol_head"
+      tol_h_res_HC: "1/vol_res"
+  - id: 15
+    name: "reaction_15"
+    description: "Rate law 15 from Maple"
+    output: true
+    output_filename: "xrate15"
+    rate: "k_exch_res_HC*alpha_res*(tol_d_head_HC-tol_d_res_HC*H_d)*sw2"
+    stoichiometry:
+      tol_d_head_HC: "-1/vol_head"
+      tol_d_res_HC: "1/vol_res"
+  - id: 16
+    name: "reaction_16"
+    description: "Rate law 16 from Maple"
+    output: true
+    output_filename: "xrate16"
+    rate: "k_exch_head_HC*(tol_h_g_HC-tol_h_head_HC)*sw2"
+    stoichiometry:
+      tol_h_g_HC: "-1/vol_g"
+      tol_h_head_HC: "1/vol_head"
+  - id: 17
+    name: "reaction_17"
+    description: "Rate law 17 from Maple"
+    output: true
+    output_filename: "xrate17"
+    rate: "k_exch_head_HC*alpha_head*(tol_d_g_HC-tol_d_head_HC)*sw2"
+    stoichiometry:
+      tol_d_g_HC: "-1/vol_g"
+      tol_d_head_HC: "1/vol_head"
+  - id: 18
+    name: "reaction_18"
+    description: "Rate law 18 from Maple"
+    output: true
+    output_filename: "xrate18"
+    rate: "k_exch_B1*(tol_h_g_B1-tol_h_l_B1*H_h)*sw1"
+    stoichiometry:
+      tol_h_g_B1: -1
+      tol_h_l_B1: "volfact_pore"
+  - id: 19
+    name: "reaction_19"
+    description: "Rate law 19 from Maple"
+    output: true
+    output_filename: "xrate19"
+    rate: "k_exch_B1*alpha_ex*(tol_d_g_B1-tol_d_l_B1*H_d)*sw1"
+    stoichiometry:
+      tol_d_g_B1: -1
+      tol_d_l_B1: "volfact_pore"
+  - id: 20
+    name: "reaction_20"
+    description: "Rate law 20 from Maple"
+    output: true
+    output_filename: "xrate20"
+    rate: "kmax_l_B1*exp(-dec_t_B1*t_stamp)*tol_h_l_B1/(Ks+tol_h_l_B1+tol_d_l_B1*alpha_tol_b)*sw1"
+    stoichiometry:
+      tol_h_l_B1: -1
+  - id: 21
+    name: "reaction_21"
+    description: "Rate law 21 from Maple"
+    output: true
+    output_filename: "xrate21"
+    rate: "kmax_l_B1*exp(-dec_t_B1*t_stamp)*tol_d_l_B1/(Ks/alpha_tol_b+tol_h_l_B1/alpha_tol_b+tol_d_l_B1)*sw1"
+    stoichiometry:
+      tol_d_l_B1: -1
+  - id: 22
+    name: "reaction_22"
+    description: "Rate law 22 from Maple"
+    output: true
+    output_filename: "xrate22"
+    rate: "k_exch_res_B1*(tol_h_head_B1-tol_h_res_B1*H_h)*sw2"
+    stoichiometry:
+      tol_h_head_B1: "-1/vol_head"
+      tol_h_res_B1: "1/vol_res"
+  - id: 23
+    name: "reaction_23"
+    description: "Rate law 23 from Maple"
+    output: true
+    output_filename: "xrate23"
+    rate: "k_exch_res_B1*alpha_res*(tol_d_head_B1-tol_d_res_B1*H_d)*sw2"
+    stoichiometry:
+      tol_d_head_B1: "-1/vol_head"
+      tol_d_res_B1: "1/vol_res"
+  - id: 24
+    name: "reaction_24"
+    description: "Rate law 24 from Maple"
+    output: true
+    output_filename: "xrate24"
+    rate: "k_exch_head_B1*(tol_h_g_B1-tol_h_head_B1)*sw2"
+    stoichiometry:
+      tol_h_g_B1: "-1/vol_g"
+      tol_h_head_B1: "1/vol_head"
+  - id: 25
+    name: "reaction_25"
+    description: "Rate law 25 from Maple"
+    output: true
+    output_filename: "xrate25"
+    rate: "k_exch_head_B1*alpha_head*(tol_d_g_B1-tol_d_head_B1)*sw2"
+    stoichiometry:
+      tol_d_g_B1: "-1/vol_g"
+      tol_d_head_B1: "1/vol_head"
+  - id: 26
+    name: "reaction_26"
+    description: "Rate law 26 from Maple"
+    output: true
+    output_filename: "xrate26"
+    rate: "k_exch_B2*(tol_h_g_B2-tol_h_l_B2*H_h)*sw1"
+    stoichiometry:
+      tol_h_g_B2: -1
+      tol_h_l_B2: "volfact_pore"
+  - id: 27
+    name: "reaction_27"
+    description: "Rate law 27 from Maple"
+    output: true
+    output_filename: "xrate27"
+    rate: "k_exch_B2*alpha_ex*(tol_d_g_B2-tol_d_l_B2*H_d)*sw1"
+    stoichiometry:
+      tol_d_g_B2: -1
+      tol_d_l_B2: "volfact_pore"
+  - id: 28
+    name: "reaction_28"
+    description: "Rate law 28 from Maple"
+    output: true
+    output_filename: "xrate28"
+    rate: "kmax_l_B2*exp(-dec_t_B2*t_stamp)*tol_h_l_B2/(Ks+tol_h_l_B2+tol_d_l_B2*alpha_tol_b)*sw1"
+    stoichiometry:
+      tol_h_l_B2: -1
+  - id: 29
+    name: "reaction_29"
+    description: "Rate law 29 from Maple"
+    output: true
+    output_filename: "xrate29"
+    rate: "kmax_l_B2*exp(-dec_t_B2*t_stamp)*tol_d_l_B2/(Ks/alpha_tol_b+tol_h_l_B2/alpha_tol_b+tol_d_l_B2)*sw1"
+    stoichiometry:
+      tol_d_l_B2: -1
+  - id: 30
+    name: "reaction_30"
+    description: "Rate law 30 from Maple"
+    output: true
+    output_filename: "xrate30"
+    rate: "k_exch_res_B2*(tol_h_head_B2-tol_h_res_B2*H_h)*sw2"
+    stoichiometry:
+      tol_h_head_B2: "-1/vol_head"
+      tol_h_res_B2: "1/vol_res"
+  - id: 31
+    name: "reaction_31"
+    description: "Rate law 31 from Maple"
+    output: true
+    output_filename: "xrate31"
+    rate: "k_exch_res_B2*alpha_res*(tol_d_head_B2-tol_d_res_B2*H_d)*sw2"
+    stoichiometry:
+      tol_d_head_B2: "-1/vol_head"
+      tol_d_res_B2: "1/vol_res"
+  - id: 32
+    name: "reaction_32"
+    description: "Rate law 32 from Maple"
+    output: true
+    output_filename: "xrate32"
+    rate: "k_exch_head_B2*(tol_h_g_B2-tol_h_head_B2)*sw2"
+    stoichiometry:
+      tol_h_g_B2: "-1/vol_g"
+      tol_h_head_B2: "1/vol_head"
+  - id: 33
+    name: "reaction_33"
+    description: "Rate law 33 from Maple"
+    output: true
+    output_filename: "xrate33"
+    rate: "k_exch_head_B2*alpha_head*(tol_d_g_B2-tol_d_head_B2)*sw2"
+    stoichiometry:
+      tol_d_g_B2: "-1/vol_g"
+      tol_d_head_B2: "1/vol_head"
+  - id: 34
+    name: "reaction_34"
+    description: "Rate law 34 from Maple"
+    output: true
+    output_filename: "xrate34"
+    rate: "k_exch_B3*(tol_h_g_B3-tol_h_l_B3*H_h)*sw1"
+    stoichiometry:
+      tol_h_g_B3: -1
+      tol_h_l_B3: "volfact_pore"
+  - id: 35
+    name: "reaction_35"
+    description: "Rate law 35 from Maple"
+    output: true
+    output_filename: "xrate35"
+    rate: "k_exch_B3*alpha_ex*(tol_d_g_B3-tol_d_l_B3*H_d)*sw1"
+    stoichiometry:
+      tol_d_g_B3: -1
+      tol_d_l_B3: "volfact_pore"
+  - id: 36
+    name: "reaction_36"
+    description: "Rate law 36 from Maple"
+    output: true
+    output_filename: "xrate36"
+    rate: "kmax_l_B3*exp(-dec_t_B3*t_stamp)*tol_h_l_B3/(Ks+tol_h_l_B3+tol_d_l_B3*alpha_tol_b)*sw1"
+    stoichiometry:
+      tol_h_l_B3: -1
+  - id: 37
+    name: "reaction_37"
+    description: "Rate law 37 from Maple"
+    output: true
+    output_filename: "xrate37"
+    rate: "kmax_l_B3*exp(-dec_t_B2*t_stamp)*tol_d_l_B3/(Ks/alpha_tol_b+tol_h_l_B3/alpha_tol_b+tol_d_l_B3)*sw1"
+    stoichiometry:
+      tol_d_l_B3: -1
+  - id: 38
+    name: "reaction_38"
+    description: "Rate law 38 from Maple"
+    output: true
+    output_filename: "xrate38"
+    rate: "k_exch_res_B3*(tol_h_head_B3-tol_h_res_B3*H_h)*sw2"
+    stoichiometry:
+      tol_h_head_B3: "-1/vol_head"
+      tol_h_res_B3: "1/vol_res"
+  - id: 39
+    name: "reaction_39"
+    description: "Rate law 39 from Maple"
+    output: true
+    output_filename: "xrate39"
+    rate: "k_exch_res_B3*alpha_res*(tol_d_head_B3-tol_d_res_B3*H_d)*sw2"
+    stoichiometry:
+      tol_d_head_B3: "-1/vol_head"
+      tol_d_res_B3: "1/vol_res"
+  - id: 40
+    name: "reaction_40"
+    description: "Rate law 40 from Maple"
+    output: true
+    output_filename: "xrate40"
+    rate: "k_exch_head_B3*(tol_h_g_B3-tol_h_head_B3)*sw2"
+    stoichiometry:
+      tol_h_g_B3: "-1/vol_g"
+      tol_h_head_B3: "1/vol_head"
+  - id: 41
+    name: "reaction_41"
+    description: "Rate law 41 from Maple"
+    output: true
+    output_filename: "xrate41"
+    rate: "k_exch_head_B3*alpha_head*(tol_d_g_B3-tol_d_head_B3)*sw2"
+    stoichiometry:
+      tol_d_g_B3: "-1/vol_g"
+      tol_d_head_B3: "1/vol_head"
+
+advanced:
+  preprocessing:
+    gaussian_elimination: true
+    symbolic_simplification: true
+
+  equilibrium:
+    enabled: false
+    reactions: []
+
+  optimization:
+    enabled: false
+
+  listnotransp: [1, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 36, 37, 38, 39, 40, 41]
+
+notes:
+  - "Converted from Column_volatile_compounds-full-all_columns markdown source"
+  - "Species order follows Maple variables list exactly"
+  - "Boundary, transport, and initial values are mapped index-wise"
+
+references:
+  - "ACG/BRNS switch model: Column_volatile_compounds-full-all_columns"
+
+caveats:
+  - "Some parameter values are symbolic Maple expressions"
+  - "Reaction stoichiometry reconstructed from Maple dtol_*dt equations"
+
