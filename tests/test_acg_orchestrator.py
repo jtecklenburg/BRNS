@@ -607,6 +607,53 @@ class TestFailFastParsing(unittest.TestCase):
             orchestrator.run_preprocessing()
         self.assertIn('Failed to parse mapped rate expression', str(ctx.exception))
 
+
+class TestSwitchConditionNormalization(unittest.TestCase):
+    """Tests for advanced.switches condition normalization."""
+
+    def setUp(self):
+        self.orchestrator = ACGOrchestrator.__new__(ACGOrchestrator)
+
+    def test_maple_style_condition_is_preserved(self):
+        cond = self.orchestrator._normalize_switch_condition('30.0 - x(j)')
+        self.assertEqual(cond, '30.0 - x(j)')
+
+    def test_lt_operator_is_normalized(self):
+        cond = self.orchestrator._normalize_switch_condition('x(j) < 30.0')
+        self.assertEqual(cond, 'x(j).lt.30.0')
+
+    def test_all_comparison_operators_are_normalized(self):
+        self.assertEqual(
+            self.orchestrator._normalize_switch_condition('x(j) <= 30.0'),
+            'x(j).le.30.0',
+        )
+        self.assertEqual(
+            self.orchestrator._normalize_switch_condition('x(j) > 30.0'),
+            'x(j).gt.30.0',
+        )
+        self.assertEqual(
+            self.orchestrator._normalize_switch_condition('x(j) >= 30.0'),
+            'x(j).ge.30.0',
+        )
+        self.assertEqual(
+            self.orchestrator._normalize_switch_condition('x(j) == 30.0'),
+            'x(j).eq.30.0',
+        )
+        self.assertEqual(
+            self.orchestrator._normalize_switch_condition('x(j) != 30.0'),
+            'x(j).ne.30.0',
+        )
+
+    def test_logical_words_are_normalized(self):
+        cond = self.orchestrator._normalize_switch_condition(
+            'x(j) < 30.0 and x(j) > 1.0e-2'
+        )
+        self.assertEqual(cond, 'x(j).lt.30.0 .and. x(j).gt.1.0e-2')
+
+    def test_empty_condition_raises_error(self):
+        with self.assertRaises(ACGOrchestrationError):
+            self.orchestrator._normalize_switch_condition('   ')
+
     def test_build_net_rates_fails_on_bad_stoichiometric_coefficient(self):
         orchestrator = ACGOrchestrator.__new__(ACGOrchestrator)
         orchestrator.verbose = False

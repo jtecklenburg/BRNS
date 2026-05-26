@@ -797,6 +797,43 @@ class ACGOrchestrator:
         """Return the validated parameters mapping, or an empty mapping."""
         return self._get_mapping_section('parameters', {})
 
+    def _normalize_switch_condition(self, condition: str) -> str:
+        """
+        Normalize a YAML switch condition into Fortran-compatible syntax.
+
+        Supported forms:
+        - Maple style numeric condition: "30.0 - x(j)"
+        - Comparison operators: "x(j) < 30.0", "x(j) >= 1.0e-2"
+        - Fortran operators are passed through: ".lt.", ".ge.", etc.
+        - Logical words are normalized: and/or/not -> .and./.or./.not.
+        """
+        if not isinstance(condition, str) or not condition.strip():
+            raise ACGOrchestrationError(
+                "Invalid switch condition: expected non-empty string"
+            )
+
+        normalized = condition.strip()
+
+        # Normalize common logical operators to Fortran style.
+        normalized = re.sub(r'\band\b', '.and.', normalized, flags=re.IGNORECASE)
+        normalized = re.sub(r'\bor\b', '.or.', normalized, flags=re.IGNORECASE)
+        normalized = re.sub(r'\bnot\b', '.not.', normalized, flags=re.IGNORECASE)
+
+        # Translate comparison operators to Fortran form. Apply longer operators
+        # first so e.g. '<=' is not split by the '<' replacement.
+        replacements = [
+            (r'\s*<=\s*', '.le.'),
+            (r'\s*>=\s*', '.ge.'),
+            (r'\s*==\s*', '.eq.'),
+            (r'\s*!=\s*', '.ne.'),
+            (r'\s*<\s*', '.lt.'),
+            (r'\s*>\s*', '.gt.'),
+        ]
+        for pattern, repl in replacements:
+            normalized = re.sub(pattern, repl, normalized)
+
+        return normalized
+
     def _extract_physical_codegen_data(self) -> tuple[list, list, list, list]:
         """Build physical parameter arrays for acg0/acg8 consistently."""
         params_cfg = self._get_parameters_mapping()
@@ -1199,9 +1236,12 @@ class ACGOrchestrator:
         switch_conditions = {}
         switch_names = []
         for entry in switch_entries:
+            if not isinstance(entry, dict):
+                continue
             name = entry.get('name')
             condition = entry.get('condition')
             if name and condition:
+                condition = self._normalize_switch_condition(condition)
                 switch_names.append(name)
                 switch_conditions[name] = condition
 
