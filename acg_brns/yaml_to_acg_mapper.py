@@ -146,11 +146,27 @@ class YAMLtoACGMapper:
         """
         bio_name = []
         bio_val = []
-        
-        if 'parameters' not in self.config:
+
+        params_cfg = self.config.get('parameters', {})
+        if not isinstance(params_cfg, dict):
             return bio_name, bio_val
-        
-        for name, val in self._iter_parameter_entries():
+
+        # Maple-compatible: bio arrays are sourced from biogeochemical
+        # parameters only. Physical and flag parameters are handled separately.
+        bio_section = params_cfg.get('biogeochemical', [])
+
+        entries = []
+        if isinstance(bio_section, dict):
+            entries = list(bio_section.items())
+        elif isinstance(bio_section, list):
+            for item in bio_section:
+                if not isinstance(item, dict):
+                    continue
+                name = item.get('name')
+                if isinstance(name, str) and 'value' in item:
+                    entries.append((name, item.get('value')))
+
+        for name, val in entries:
             bio_name.append(name)
 
             if name in self.params:

@@ -543,7 +543,7 @@ class FormulaEvaluator:
 
 def main():
     """
-    Example usage with Canfield model.
+    Example usage with equilibrium model.
     """
     import yaml
     import os
