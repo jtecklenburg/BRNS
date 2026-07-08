@@ -105,6 +105,34 @@ class TestBioArrayBuilding(unittest.TestCase):
         self.assertEqual(bio_name, ['kfox', 'kmo2', 'ho2'])
         self.assertEqual(bio_val, [0.221, 8.0e-6, 0.0])
 
+    def test_bio_arrays_include_all_first_level_parameter_sections(self):
+        """All parameters.* sections on first level must be included."""
+        config = {
+            'parameters': {
+                'biogeochemical': [
+                    {'name': 'kfox', 'value': 0.221},
+                ],
+                'physical': {
+                    'por0': 0.8,
+                },
+                'custom': [
+                    {'name': 'k_custom', 'value': '2*por0'},
+                ],
+            },
+            'species': []
+        }
+        evaluated = {
+            'kfox': 0.221,
+            'por0': 0.8,
+            'k_custom': 1.6,
+        }
+        mapper = YAMLtoACGMapper(config, evaluated)
+
+        bio_name, bio_val = mapper.build_bio_arrays()
+
+        self.assertEqual(bio_name, ['kfox', 'por0', 'k_custom'])
+        self.assertEqual(bio_val, [0.221, 0.8, 1.6])
+
 
 class TestVariablesList(unittest.TestCase):
     """Test species ordering in variables list."""
@@ -594,6 +622,40 @@ class TestGlobalRateComponentExpansion(unittest.TestCase):
                     {'name': 'k17_2', 'value': 1.0},
                     {'name': 'K_mnco3', 'value': 1.0},
                 ]
+            },
+            'reactions': [
+                {
+                    'id': 17,
+                    'name': 'mnco3_precipitation',
+                    'rate': '(k17_1*sw17 + k17_2*mnco3*(1-sw17))*(omega_mn-1)',
+                    'rate_components': {
+                        'omega_mn': 'mn2*co3/K_mnco3',
+                        'sw17': '1',
+                    },
+                }
+            ],
+        }
+
+        mapper = YAMLtoACGMapper(config, {})
+        reactions = mapper.build_rate_expressions()
+
+        self.assertIn('sw17', reactions[0]['rate_expanded'])
+        self.assertNotIn('(1)', reactions[0]['rate_expanded'])
+
+    def test_non_biogeochemical_parameters_are_not_inlined(self):
+        config = {
+            'species': [
+                {'name': 'mn2', 'type': 'dissolved'},
+                {'name': 'co3', 'type': 'dissolved'},
+                {'name': 'mnco3', 'type': 'solid'},
+            ],
+            'parameters': {
+                'custom': {
+                    'sw17': 1,
+                    'k17_1': 1.0,
+                    'k17_2': 1.0,
+                    'K_mnco3': 1.0,
+                }
             },
             'reactions': [
                 {

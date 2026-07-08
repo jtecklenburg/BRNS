@@ -74,26 +74,42 @@ class YAMLtoACGMapper:
 
         return list(reactions)
 
-    def _get_biogeochemical_parameter_names(self) -> set:
+    def _iter_parameter_entries(self):
         """
-        Return names of declared biogeochemical parameters.
+        Iterate all parameter entries across first-level `parameters.*` sections.
 
-        Supports both subsection syntaxes:
-        - list style: [{name: ..., value: ...}, ...]
-        - mapping style: {name: value, ...}
+        Supported per-section syntaxes:
+        - mapping style: `name: value`
+        - list style: `- name: ...; value: ...`
+
+        Yields:
+            Tuple[str, Any]: (parameter_name, raw_value)
         """
-        names = set()
-        bio_params = self.config.get('parameters', {}).get('biogeochemical', [])
-        if isinstance(bio_params, list):
-            for param in bio_params:
-                name = param.get('name')
-                if name:
-                    names.add(name)
-        elif isinstance(bio_params, dict):
-            for name in bio_params.keys():
-                if isinstance(name, str):
-                    names.add(name)
-        return names
+        params_cfg = self.config.get('parameters', {})
+        if not isinstance(params_cfg, dict):
+            return
+
+        for section_data in params_cfg.values():
+            if isinstance(section_data, dict):
+                for name, value in section_data.items():
+                    if isinstance(name, str):
+                        yield name, value
+            elif isinstance(section_data, list):
+                for item in section_data:
+                    if not isinstance(item, dict):
+                        continue
+                    name = item.get('name')
+                    if isinstance(name, str) and 'value' in item:
+                        yield name, item.get('value')
+
+    def _get_parameter_names(self) -> set:
+        """
+        Return names of declared parameters across all first-level sections.
+
+        Subsection labels under `parameters` are treated as user-level
+        structure only; parameter semantics are defined by the entries.
+        """
+        return {name for name, _ in self._iter_parameter_entries()}
 
     def _build_global_rate_components(self) -> Dict[str, str]:
         """
@@ -104,11 +120,11 @@ class YAMLtoACGMapper:
         while other reactions reference them later. Maple resolves those helper
         symbols globally before generating Fortran, so we mirror that behavior.
 
-        Components that are also declared biogeochemical parameters (for example
+        Components that are also declared model parameters (for example
         `sw17`, `sw18`, `sw19`) must NOT be inlined, otherwise the generated
         Fortran hardcodes them and diverges from Maple/reference behavior.
         """
-        parameter_names = self._get_biogeochemical_parameter_names()
+        parameter_names = self._get_parameter_names()
         components: Dict[str, str] = {}
 
         for reaction in self._get_ordered_reactions():
@@ -134,45 +150,20 @@ class YAMLtoACGMapper:
         if 'parameters' not in self.config:
             return bio_name, bio_val
         
-        # Get biogeochemical parameters
-        if 'biogeochemical' in self.config['parameters']:
-            bio_params = self.config['parameters']['biogeochemical']
-            
-            if isinstance(bio_params, list):
-                for param in bio_params:
-                    if 'name' in param:
-                        name = param['name']
-                        bio_name.append(name)
-                        
-                        # Get evaluated value
-                        if name in self.params:
-                            bio_val.append(float(self.params[name]))
-                        else:
-                            # Allow explicit numeric literals from YAML only.
-                            # Formula-based parameters must be evaluated before mapping.
-                            val = param.get('value', 0.0)
-                            if isinstance(val, (int, float)):
-                                bio_val.append(float(val))
-                            else:
-                                raise ValueError(
-                                    f"Biogeochemical parameter '{name}' has no evaluated numeric value. "
-                                    f"Original value: {val!r}"
-                                )
-            elif isinstance(bio_params, dict):
-                for name, val in bio_params.items():
-                    if not isinstance(name, str):
-                        continue
-                    bio_name.append(name)
+        for name, val in self._iter_parameter_entries():
+            bio_name.append(name)
 
-                    if name in self.params:
-                        bio_val.append(float(self.params[name]))
-                    elif isinstance(val, (int, float)):
-                        bio_val.append(float(val))
-                    else:
-                        raise ValueError(
-                            f"Biogeochemical parameter '{name}' has no evaluated numeric value. "
-                            f"Original value: {val!r}"
-                        )
+            if name in self.params:
+                bio_val.append(float(self.params[name]))
+            elif isinstance(val, (int, float)):
+                # Allow explicit numeric literals from YAML only.
+                # Formula-based parameters must be evaluated before mapping.
+                bio_val.append(float(val))
+            else:
+                raise ValueError(
+                    f"Parameter '{name}' has no evaluated numeric value. "
+                    f"Original value: {val!r}"
+                )
         
         return bio_name, bio_val
     
@@ -427,6 +418,7 @@ class YAMLtoACGMapper:
         
         reactions = self._get_ordered_reactions()
         global_components = self._build_global_rate_components()
+        parameter_names = self._get_parameter_names()
         result = []
         
         for reaction in reactions:
@@ -443,7 +435,7 @@ class YAMLtoACGMapper:
                 {
                     name: str(expr)
                     for name, expr in reaction.get('rate_components', {}).items()
-                    if name not in self._get_biogeochemical_parameter_names()
+                    if name not in parameter_names
                 }
             )
             
