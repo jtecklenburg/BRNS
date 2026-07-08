@@ -1161,6 +1161,12 @@ advanced:
   optimization:
     enabled: false
 
+  timestep_parameters:
+    dtold: 1.d-6
+    ttol: 5.d-2
+    tstep: 5.0d-4
+    maxconc: 0.d0
+
   switches:
     - name: "sw1"
       condition: "x(j) < 30.0"

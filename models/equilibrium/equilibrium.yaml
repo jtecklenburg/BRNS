@@ -832,6 +832,12 @@ advanced:
   optimization:
     enabled: false
 
+  timestep_parameters:
+    dtold: 1.d-6
+    ttol: 5.d-2
+    tstep: 1.0d-5
+    maxconc: 0.d0
+
   # switches: not used - sw17/sw18/sw19 are constant parameters (value=1) as in Maple reference
 
 # ======================================================================

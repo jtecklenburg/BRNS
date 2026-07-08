@@ -553,6 +553,44 @@ class YAMLtoACGMapper:
         
         return init_data
 
+    def get_timestep_parameters(self) -> Dict[str, Any]:
+        """
+        Extract timestep initialization parameters from advanced YAML block.
+
+        Reads optional `advanced.timestep_parameters` with keys:
+        - dtold
+        - ttol
+        - tstep
+        - maxconc
+
+        If a key is missing, default BRNS values are used.
+
+        Returns:
+            Dictionary with keys dtold, ttol, tstep, maxconc.
+            Values may be numeric or strings (e.g. Fortran literals).
+        """
+        defaults: Dict[str, Any] = {
+            'dtold': '1.d-6',
+            'ttol': '5.d-2',
+            'tstep': '1.0d0',
+            'maxconc': '0.d0',
+        }
+
+        advanced_cfg = self.config.get('advanced', {})
+        if not isinstance(advanced_cfg, dict):
+            return defaults.copy()
+
+        ts_cfg = advanced_cfg.get('timestep_parameters', {})
+        if not isinstance(ts_cfg, dict):
+            return defaults.copy()
+
+        result = defaults.copy()
+        for key in defaults.keys():
+            if key in ts_cfg and ts_cfg[key] is not None:
+                result[key] = ts_cfg[key]
+
+        return result
+
 
 def main():
     """Example usage with Canfield model."""

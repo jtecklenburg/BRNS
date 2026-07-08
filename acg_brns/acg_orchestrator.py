@@ -1187,7 +1187,7 @@ class ACGOrchestrator:
     
     def run_code_generation(self) -> Dict[str, Any]:
         """
-        Execute ACG code generation functions (acg0-acg17b).
+        Execute ACG code generation functions (acg0-acg18).
         
         Generates all Fortran subroutines following proc0903-M.md sequence.
         
@@ -1344,6 +1344,11 @@ class ACGOrchestrator:
             print("  Generating parameter array...")
         parameter_names = self.acg_data.get('bio_name', [])
         self.acg.acg17b(parameter_names=parameter_names)
+
+        # Time step initialization include (acg18)
+        if self.verbose:
+            print("  Generating timestep initialization include...")
+        self.acg.acg18(**params['timestep_parameters'])
         
         if self.verbose:
             print(f"✓ Code generation complete")
@@ -1397,6 +1402,9 @@ class ACGOrchestrator:
         time_cfg = self._get_mapping_section('time', {})
         params['tot_time'] = time_cfg.get('total', 1.0)
         params['delt'] = time_cfg.get('step', 0.1)
+
+        # Timestep initialization parameters (advanced.timestep_parameters)
+        params['timestep_parameters'] = self.mapper.get_timestep_parameters()
         
         # Physical/environment aliases (prefer evaluated generic parameters)
         physical = params_cfg.get('physical', {})

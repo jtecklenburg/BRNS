@@ -24,6 +24,7 @@ Function List (Maple-Compatible Names):
     acg17a(...) - Spatial switches (switches.f)
     acg17b(...) - Parameters array (parameters.f)
     acg17c(...) - Variable porosity (varporosity.f)
+    acg18(...)  - Time step parameter init include (inittimestep.inc)
 
 All function names now match Maple original (proc0903-M.md) for direct equivalence.
 For detailed documentation, see docstring of each method (marked with **Maple equivalent:**).
@@ -1376,6 +1377,79 @@ class ACGModule:
 
         output_file = self.output_dir / 'varporosity.f'
         genfor(str(output_file), [subroutinem('updateporosity', ['mydummy'], code)])
+        print(f"✓ Generated: {output_file.name}")
+
+    # ======================================================================
+    # ACG18: inittimestep.inc - Time step parameter initialization include
+    # ======================================================================
+
+    def acg18(
+        self,
+        dtold: Union[str, int, float] = '1.d-6',
+        ttol: Union[str, int, float] = '5.d-2',
+        tstep: Union[str, int, float] = '1.0d0',
+        maxconc: Union[str, int, float] = '0.d0',
+    ) -> None:
+        """
+        Generate inittimestep.inc - BLOCK DATA initialization for /tsparam/.
+
+        Writes all timestep parameters to a dedicated include file:
+        dtold, ttol, tstep, maxconc.
+
+        Defaults match the current BRNS values:
+        dtold/1.d-6/, ttol/5.d-2/, tstep/1.0d0/, maxconc/0.d0/
+
+        Args:
+            dtold: Previous timestep default value
+            ttol: Timestep tolerance value
+            tstep: Initial/base timestep value
+            maxconc: Initial maximum concentration value
+        """
+
+        def _format_fortran_data_value(value: Union[str, int, float]) -> str:
+            if isinstance(value, str):
+                value_str = value.strip()
+                if not value_str:
+                    raise ValueError("Fortran DATA value string must not be empty")
+                return value_str
+
+            if not isinstance(value, (int, float)):
+                raise TypeError(
+                    "Expected str, int or float for timestep parameter, "
+                    f"got {type(value).__name__}: {value}"
+                )
+
+            if float(value) == 0.0:
+                return '0.d0'
+
+            sci = f"{float(value):.16e}"
+            mantissa, exponent = sci.split('e')
+            mantissa = mantissa.rstrip('0').rstrip('.')
+            if '.' not in mantissa:
+                mantissa = f"{mantissa}.0"
+            exponent_int = int(exponent)
+            return f"{mantissa}d{exponent_int}"
+
+        dtold_s = _format_fortran_data_value(dtold)
+        ttol_s = _format_fortran_data_value(ttol)
+        tstep_s = _format_fortran_data_value(tstep)
+        maxconc_s = _format_fortran_data_value(maxconc)
+
+        lines = [
+            "c    $Id: inittimestep.inc 16 2026-07-08 10:56:47Z tecklenburg $",
+            "      BLOCK DATA InitTimeStep",
+            "        include 'timestep.inc'",
+            (
+                "        DATA "
+                f"dtold/{dtold_s}/, ttol/{ttol_s}/, "
+                f"tstep/{tstep_s}/, maxconc/{maxconc_s}/"
+            ),
+            "      END",
+            "",
+        ]
+
+        output_file = self.output_dir / 'inittimestep.inc'
+        output_file.write_text("\n".join(lines), encoding='utf-8')
         print(f"✓ Generated: {output_file.name}")
 
 

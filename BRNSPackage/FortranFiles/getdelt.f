@@ -1,10 +1,5 @@
 c    $Id: getdelt.f 16 2007-10-18 12:36:47Z centler $
-      BLOCK DATA InitTimeStep
-        common/tsparam/dtold,ttol,tstep,maxconc
-        real*8 dtold,ttol,tstep,maxconc
-c         DATA dtold/1.d-6/, ttol/5.d-2/, tstep/50.0/, maxconc/0.d0/
-        DATA dtold/1.d-6/, ttol/5.d-2/, tstep/1.0d0/, maxconc/0.d0/
-         END
+  include 'inittimestep.inc'
 
       subroutine getdelt(nt,time,tend,spg)
 
