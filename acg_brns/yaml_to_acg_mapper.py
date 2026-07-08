@@ -75,13 +75,23 @@ class YAMLtoACGMapper:
         return list(reactions)
 
     def _get_biogeochemical_parameter_names(self) -> set:
-        """Return names of declared biogeochemical parameters."""
+        """
+        Return names of declared biogeochemical parameters.
+
+        Supports both subsection syntaxes:
+        - list style: [{name: ..., value: ...}, ...]
+        - mapping style: {name: value, ...}
+        """
         names = set()
         bio_params = self.config.get('parameters', {}).get('biogeochemical', [])
         if isinstance(bio_params, list):
             for param in bio_params:
                 name = param.get('name')
                 if name:
+                    names.add(name)
+        elif isinstance(bio_params, dict):
+            for name in bio_params.keys():
+                if isinstance(name, str):
                     names.add(name)
         return names
 
@@ -148,6 +158,21 @@ class YAMLtoACGMapper:
                                     f"Biogeochemical parameter '{name}' has no evaluated numeric value. "
                                     f"Original value: {val!r}"
                                 )
+            elif isinstance(bio_params, dict):
+                for name, val in bio_params.items():
+                    if not isinstance(name, str):
+                        continue
+                    bio_name.append(name)
+
+                    if name in self.params:
+                        bio_val.append(float(self.params[name]))
+                    elif isinstance(val, (int, float)):
+                        bio_val.append(float(val))
+                    else:
+                        raise ValueError(
+                            f"Biogeochemical parameter '{name}' has no evaluated numeric value. "
+                            f"Original value: {val!r}"
+                        )
         
         return bio_name, bio_val
     
@@ -548,7 +573,7 @@ def main():
     from acg_brns.formula_evaluator import FormulaEvaluator
     
     # Load YAML
-    yaml_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'canfield_refactored.yaml')
+    yaml_path = os.path.join(os.path.dirname(__file__), '..', 'models', 'equilibrium', 'equilibrium.yaml')
     with open(yaml_path, 'r') as f:
         config = yaml.safe_load(f)
     

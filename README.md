@@ -158,12 +158,23 @@ flake8 acg_brns/ tests/
 
 MIT License. See [LICENSE](LICENSE).
 
-## Literature Hints
+## Literature
 
 - Regnier, P., Jourabchi, P., & Slomp, C.P. (2003). *Reactive-transport modeling as a technique for understanding coupled biogeochemical processes in surface and subsurface environments*. *Netherlands Journal of Geosciences*, 82(1), 5–18.
 
+- Regnier, P.,O’Kane,J.,Steefel,C.,Vanderborght,J.,2002. Modelingcomplexmulti-
+component reactive-transportsystems:towardsasimulationenvironment
+based ontheconceptofaknowledgebase.AppliedMathematicalModelling
+26, 913–927.
+
+- Aguilera, D.,Jourabchi,P.,Spiteri,C.,Regnier,P.,2005. Aknowledge-basedreactive
+transport approachforthesimulationofbiogeochemicaldynamicsinearth
+systems. Geochemistry,Geophysics,Geosystems6(Q07012),1–1810.1029/
+2004GC000899.
+
+- Centler, F., Shao, H., Biase, C., Park, C.-H., Regnier, P., Kolditz, O., Thullner, M., (2010). *GeoSysBRNS: a flexible multidimensional reactive transport model for simulating biogeochemical subsurface processes*. Comput. Geosci. 36, 397e405.
 ## Acknowledgments
 
-ACG-BRNS is a Python evolution of the Maple-based BRNS ACG workflow and integrates with the broader thermooptiplan ecosystem.
+ACG-BRNS is a Python evolution of the Maple-based BRNS ACG workflow. 
 
 Funded by ptj, Förderprogramm: Geoforschung und Nachhaltigkeit (GEO:N), Förderkennzeichen: 03G0937B (BMFTR)

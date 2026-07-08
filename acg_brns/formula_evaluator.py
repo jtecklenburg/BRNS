@@ -15,6 +15,41 @@ import re
 from collections import defaultdict, deque
 
 
+MATH_FUNCTION_NAMESPACE = {
+    'sqrt': sp.sqrt,
+    'log': sp.log,
+    'log10': lambda x: sp.log(x, 10),
+    'ln': sp.log,
+    'exp': sp.exp,
+    'sin': sp.sin,
+    'cos': sp.cos,
+    'tan': sp.tan,
+    'asin': sp.asin,
+    'acos': sp.acos,
+    'atan': sp.atan,
+    'sinh': sp.sinh,
+    'cosh': sp.cosh,
+    'tanh': sp.tanh,
+    'abs': sp.Abs,
+    'ceil': sp.ceiling,
+    'floor': sp.floor,
+    'min': sp.Min,
+    'max': sp.Max,
+}
+
+MATH_FUNCTION_NAMES = frozenset(MATH_FUNCTION_NAMESPACE.keys())
+
+
+def get_math_function_names() -> Set[str]:
+    """Return the supported formula-function names."""
+    return set(MATH_FUNCTION_NAMES)
+
+
+def get_math_function_namespace() -> Dict[str, Any]:
+    """Return SymPy locals for supported formula functions."""
+    return dict(MATH_FUNCTION_NAMESPACE)
+
+
 class FormulaEvaluationError(Exception):
     """Raised when formula evaluation fails"""
     pass
@@ -56,11 +91,7 @@ class DependencyResolver:
         potential_vars = re.findall(r'\b[a-zA-Z_][a-zA-Z0-9_]*\b', formula)
         
         # Filter to only known symbols (exclude math functions)
-        math_functions = {
-            'sqrt', 'log', 'log10', 'ln', 'exp', 'sin', 'cos', 'tan',
-            'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh',
-            'abs', 'ceil', 'floor', 'min', 'max'
-        }
+        math_functions = MATH_FUNCTION_NAMES
         
         dependencies = set()
         for var in potential_vars:
@@ -152,55 +183,72 @@ class FormulaEvaluator:
         self.warnings.append(message)
         if self.verbose:
             print(f"⚠️  Warning: {message}")
+
+    def _iter_parameter_entries(self):
+        """
+        Iterate all parameter entries independent of subsection naming.
+
+        Supported syntaxes in any `parameters.<subsection>`:
+        - Mapping style: `name: value`
+        - List style: `- name: ...; value: ...`
+        """
+        params_cfg = self.config.get('parameters', {})
+        if not isinstance(params_cfg, dict):
+            return
+
+        for section_name, section_data in params_cfg.items():
+            if isinstance(section_data, dict):
+                for pname, pvalue in section_data.items():
+                    if isinstance(pname, str):
+                        yield section_name, pname, pvalue
+            elif isinstance(section_data, list):
+                for item in section_data:
+                    if not isinstance(item, dict):
+                        continue
+                    pname = item.get('name')
+                    if isinstance(pname, str) and 'value' in item:
+                        yield section_name, pname, item.get('value')
+
+    def _sync_derived_aliases(self):
+        """Backfill common aliases without overriding explicit user parameters."""
+        # Temperature aliases
+        if 't_celsius' in self.evaluated and 'T_C' not in self.symbol_table:
+            self.symbol_table['T_C'] = self.evaluated['t_celsius']
+            self.evaluated['T_C'] = self.evaluated['t_celsius']
+        if 'T_C' in self.evaluated and 't_celsius' not in self.symbol_table:
+            self.symbol_table['t_celsius'] = self.evaluated['T_C']
+            self.evaluated['t_celsius'] = self.evaluated['T_C']
+
+        if 'T' not in self.symbol_table:
+            if 'T_C' in self.evaluated:
+                self.symbol_table['T'] = self.evaluated['T_C'] + 273.15
+                self.evaluated['T'] = self.evaluated['T_C'] + 273.15
+            elif 't_celsius' in self.evaluated:
+                self.symbol_table['T'] = self.evaluated['t_celsius'] + 273.15
+                self.evaluated['T'] = self.evaluated['t_celsius'] + 273.15
+
+        # Salinity alias
+        if 'salin' in self.evaluated and 'S' not in self.symbol_table:
+            self.symbol_table['S'] = self.evaluated['salin']
+            self.evaluated['S'] = self.evaluated['salin']
+        if 'S' in self.evaluated and 'salin' not in self.symbol_table:
+            self.symbol_table['salin'] = self.evaluated['S']
+            self.evaluated['salin'] = self.evaluated['S']
         
     def load_base_parameters(self):
         """
         Load parameters with concrete numeric values.
         These serve as the base of the dependency graph.
         """
-        # Physical parameters
-        if 'parameters' in self.config and 'physical' in self.config['parameters']:
-            physical = self.config['parameters']['physical']
-            for key, value in physical.items():
-                if isinstance(value, (int, float)):
-                    self.symbol_table[key] = value
-                    self.evaluated[key] = float(value)
-        
-        # Physical flags (typically integers)
-        if 'parameters' in self.config and 'physical_flags' in self.config['parameters']:
-            flags = self.config['parameters']['physical_flags']
-            for key, value in flags.items():
-                if isinstance(value, (int, float)):
-                    self.symbol_table[key] = value
-                    self.evaluated[key] = float(value)
-        
-        # Biogeochemical parameters with numeric or formula values
-        if 'parameters' in self.config and 'biogeochemical' in self.config['parameters']:
-            bio_params = self.config['parameters']['biogeochemical']
-            if isinstance(bio_params, list):
-                for param in bio_params:
-                    if 'name' in param and 'value' in param:
-                        name = param['name']
-                        value = param['value']
-                        if isinstance(value, (int, float)):
-                            self.symbol_table[name] = value
-                            self.evaluated[name] = float(value)
-                        else:
-                            # String value (could be numeric like "1.0e-8.5" or formula)
-                            self.symbol_table[name] = str(value)
-        
-        # Temperature conversion (always needed)
-        if 't_celsius' in self.evaluated:
-            T_kelvin = self.evaluated['t_celsius'] + 273.15
-            self.symbol_table['T'] = T_kelvin
-            self.evaluated['T'] = T_kelvin
-            self.symbol_table['T_C'] = self.evaluated['t_celsius']
-            self.evaluated['T_C'] = self.evaluated['t_celsius']
-        
-        # Salinity (typically from physical parameters)
-        if 'salin' in self.evaluated:
-            self.symbol_table['S'] = self.evaluated['salin']
-            self.evaluated['S'] = self.evaluated['salin']
+        for _, name, value in self._iter_parameter_entries():
+            if isinstance(value, (int, float)) and not isinstance(value, bool):
+                self.symbol_table[name] = value
+                self.evaluated[name] = float(value)
+            elif isinstance(value, str):
+                self.symbol_table[name] = value
+                self.required_parameters.add(name)
+
+        self._sync_derived_aliases()
     
     def load_computed_formulas(self):
         """
@@ -231,43 +279,21 @@ class FormulaEvaluator:
     
     def load_formula_parameters(self):
         """
-        Load parameters that reference other computed values.
-        These must be evaluated after their dependencies.
+        Backward-compatible no-op.
+
+        Formula strings from all `parameters.*` sections are now loaded in
+        load_base_parameters() and evaluated in one unified pass.
         """
-        if 'parameters' not in self.config:
-            return
-        
-        # Already loaded numeric biogeochemical params in load_base_parameters
-        # Now get the formula-based ones
-        if 'biogeochemical' in self.config['parameters']:
-            bio_params = self.config['parameters']['biogeochemical']
-            if isinstance(bio_params, list):
-                for param in bio_params:
-                    if 'name' in param and 'value' in param:
-                        name = param['name']
-                        value = param['value']
-                        if isinstance(value, str):
-                            self.required_parameters.add(name)
-                            if name not in self.symbol_table:
-                                self.symbol_table[name] = value
+        return
     
     def load_stoichiometry_parameters(self):
         """
-        Load stoichiometry coefficients (x, y, z, s_dens).
-        These are Maple parameters used in reaction stoichiometry.
+        Backward-compatible no-op.
+
+        Stoichiometry parameters are part of unified `parameters.*` loading in
+        load_base_parameters().
         """
-        if 'parameters' not in self.config:
-            return
-        
-        if 'stoichiometry' in self.config['parameters']:
-            stoi_params = self.config['parameters']['stoichiometry']
-            if isinstance(stoi_params, dict):
-                for name, value in stoi_params.items():
-                    if isinstance(value, (int, float)):
-                        self.symbol_table[name] = value
-                        self.evaluated[name] = float(value)
-                    elif isinstance(value, str):
-                        self.symbol_table[name] = value
+        return
     
     def build_dependency_graph(self) -> Dict[str, Set[str]]:
         """
@@ -320,18 +346,10 @@ class FormulaEvaluator:
             # Create sympy symbols for variables in context
             symbols = {name: sp.Symbol(name) for name in context.keys()}
             
-            # Add common math functions
+            # Add supported math functions
             local_dict = {
-                'sqrt': sp.sqrt,
-                'log': sp.log,
-                'log10': lambda x: sp.log(x, 10),
-                'ln': sp.ln,
-                'exp': sp.exp,
-                'sin': sp.sin,
-                'cos': sp.cos,
-                'tan': sp.tan,
-                'abs': sp.Abs,
-                **symbols
+                **get_math_function_namespace(),
+                **symbols,
             }
             
             # Parse expression
@@ -401,6 +419,7 @@ class FormulaEvaluator:
                     # Evaluate formula
                     result = self.evaluate_formula(value, self.evaluated)
                     self.evaluated[name] = result
+                    self._sync_derived_aliases()
                 except FormulaEvaluationError as e:
                     detail = str(e).split(':', 1)[-1].strip()
                     if name in self.required_parameters:
@@ -531,7 +550,7 @@ def main():
     
     # Load YAML configuration
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    yaml_path = os.path.join(script_dir, '..', 'models', 'canfield_refactored.yaml')
+    yaml_path = os.path.join(script_dir, '..', 'models', 'equilibrium', 'equilibrium.yaml')
     with open(yaml_path, 'r') as f:
         config = yaml.safe_load(f)
     

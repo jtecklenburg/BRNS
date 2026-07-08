@@ -763,6 +763,7 @@ parameters:
       description: "From Maple bio_name/bio_val"
 
   physical:
+    Pi: 3.141592653589793
     al: 0.0
     q0: 0.
     w0: 0.0

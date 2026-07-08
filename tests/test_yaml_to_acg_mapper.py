@@ -81,6 +81,30 @@ class TestBioArrayBuilding(unittest.TestCase):
             mapper.build_bio_arrays()
         self.assertIn("param2", str(ctx.exception))
 
+    def test_bio_arrays_mapping_style(self):
+        """Mapping-style biogeochemical subsection should be supported."""
+        config = {
+            'parameters': {
+                'biogeochemical': {
+                    'kfox': 0.221,
+                    'kmo2': 8.0e-6,
+                    'ho2': 0.0,
+                }
+            },
+            'species': []
+        }
+        evaluated = {
+            'kfox': 0.221,
+            'kmo2': 8.0e-6,
+            'ho2': 0.0,
+        }
+        mapper = YAMLtoACGMapper(config, evaluated)
+
+        bio_name, bio_val = mapper.build_bio_arrays()
+
+        self.assertEqual(bio_name, ['kfox', 'kmo2', 'ho2'])
+        self.assertEqual(bio_val, [0.221, 8.0e-6, 0.0])
+
 
 class TestVariablesList(unittest.TestCase):
     """Test species ordering in variables list."""
@@ -600,8 +624,12 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         yaml_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
             'models',
-            'canfield_refactored.yaml'
+            'equilibrium',
+            'equilibrium.yaml'
         )
+
+        if not os.path.exists(yaml_path):
+            raise unittest.SkipTest(f"Canfield YAML not found: {yaml_path}")
         
         with open(yaml_path, 'r') as f:
             cls.config = yaml.safe_load(f)

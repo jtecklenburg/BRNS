@@ -134,9 +134,34 @@ class TestConfigLoading(unittest.TestCase):
         with self.assertRaises(ACGOrchestrationError) as ctx:
             orchestrator.load_config()
         msg = str(ctx.exception)
-        self.assertIn("'parameters.biogeochemical' must be a list", msg)
-        self.assertIn("'parameters.physical' must be a mapping", msg)
-        self.assertIn("'parameters.stoichiometry' must be a mapping", msg)
+        self.assertIn("parameters.stoichiometry", msg)
+        self.assertIn("must be either a mapping or a list", msg)
+
+    def test_parameter_formula_cycle_across_subsections_is_detected(self):
+        """Cycles spanning multiple parameters subsections should be reported."""
+        yaml_path = Path(self.temp_dir) / 'cycle_across_subsections.yaml'
+        config = {
+            'species': [{'name': 'o2', 'type': 'dissolved'}],
+            'reactions': [{'id': 1, 'name': 'test', 'stoichiometry': {'o2': -1}}],
+            'parameters': {
+                'physical': {
+                    'a': 'b + 1'
+                },
+                'custom_section': [
+                    {'name': 'b', 'value': 'a + 1'}
+                ]
+            }
+        }
+        with open(yaml_path, 'w') as f:
+            yaml.dump(config, f)
+
+        orchestrator = ACGOrchestrator(str(yaml_path), str(self.output_dir))
+
+        with self.assertRaises(ACGOrchestrationError) as ctx:
+            orchestrator.load_config()
+
+        msg = str(ctx.exception)
+        self.assertIn("Circular dependency detected in parameter formulas", msg)
 
     def test_optional_sections_must_have_expected_types(self):
         """Malformed optional top-level sections should yield validation errors."""
@@ -232,7 +257,7 @@ class TestPhaseExecution(unittest.TestCase):
     
     def setUp(self):
         """Set up test with Canfield model."""
-        self.yaml_path = 'models/canfield_refactored.yaml'
+        self.yaml_path = 'models/equilibrium/equilibrium.yaml'
         self.temp_dir = tempfile.mkdtemp()
         self.output_dir = Path(self.temp_dir) / 'output'
         
@@ -311,7 +336,7 @@ class TestParameterExtraction(unittest.TestCase):
     
     def setUp(self):
         """Set up test with Canfield model."""
-        self.yaml_path = 'models/canfield_refactored.yaml'
+        self.yaml_path = 'models/equilibrium/equilibrium.yaml'
         self.temp_dir = tempfile.mkdtemp()
         self.output_dir = Path(self.temp_dir) / 'output'
         
@@ -375,7 +400,7 @@ class TestIntegrationCanfield(unittest.TestCase):
     
     def setUp(self):
         """Set up test."""
-        self.yaml_path = 'models/canfield_refactored.yaml'
+        self.yaml_path = 'models/equilibrium/equilibrium.yaml'
         self.temp_dir = tempfile.mkdtemp()
         self.output_dir = Path(self.temp_dir) / 'canfield'
         
@@ -902,6 +927,12 @@ class TestValidationMessages(unittest.TestCase):
         cfg['reactions'][0]['rate'] = 'kox * o2'
         self._load(cfg)
 
+    def test_r5_whitelisted_math_function_in_rate_ok(self):
+        """R-5: whitelisted math function names in rate must not raise symbol errors."""
+        cfg = self._minimal_config()
+        cfg['reactions'][0]['rate'] = 'exp(-kox) * o2'
+        self._load(cfg)
+
     def test_r5_rate_components_unknown_symbol(self):
         """R-5: unknown symbol in rate_components → ERROR."""
         cfg = self._minimal_config()
@@ -1086,6 +1117,25 @@ class TestReferencesR7(unittest.TestCase):
         errors = [i for i in issues if i.severity == 'ERROR' and 'init_value' in i.location]
         self.assertTrue(len(errors) >= 1, f"Expected R-7 error for init_value, got: {issues}")
         self.assertIn('ghost_var', errors[0].message)
+
+    def test_r5_unknown_function_in_rate_emits_warning(self):
+        """Unknown function calls in reference phase should warn instead of error."""
+        cfg = self._minimal_config()
+        cfg['reactions'] = [{
+            'id': 1,
+            'name': 'rx1',
+            'stoichiometry': {'o2': -1},
+            'rate': 'mystery_fn(o2)'
+        }]
+        issues = self._load(cfg)
+        warnings = [
+            i for i in issues
+            if i.severity == 'WARNING' and i.path == 'reactions[0].rate'
+        ]
+        errors = [i for i in issues if i.severity == 'ERROR' and i.path == 'reactions[0].rate']
+        self.assertTrue(warnings, f"Expected warning for unknown function, got: {issues}")
+        self.assertIn("Unknown function 'mystery_fn'", warnings[0].message)
+        self.assertEqual(errors, [], f"Unknown function should not be an ERROR in reference phase: {issues}")
 
 
 class TestFormulaValidation(unittest.TestCase):

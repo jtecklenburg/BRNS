@@ -19,7 +19,8 @@ from acg_brns.formula_evaluator import (
     DependencyResolver,
     FormulaEvaluationError,
     CircularDependencyError,
-    UndefinedVariableError
+    UndefinedVariableError,
+    get_math_function_names,
 )
 
 
@@ -73,6 +74,20 @@ class TestDependencyResolver:
         
         deps = resolver.extract_dependencies(123, known)
         assert deps == set()
+
+    def test_extract_dependencies_extended_math_functions(self):
+        """Math function names must not be treated as parameter dependencies."""
+        resolver = DependencyResolver()
+        known = {
+            'x', 'y', 'z',
+            'asin', 'acos', 'atan', 'sinh', 'cosh', 'tanh',
+            'ceil', 'floor', 'min', 'max'
+        }
+        deps = resolver.extract_dependencies(
+            "asin(x) + cosh(y) + floor(z) + max(x, y)",
+            known,
+        )
+        assert deps == {'x', 'y', 'z'}
     
     def test_topological_sort_linear(self):
         """Test topological sort with linear dependency chain"""
@@ -210,6 +225,29 @@ class TestFormulaEvaluation:
         
         result = evaluator.evaluate_formula("exp(0)", {})
         assert result == 1.0
+
+    def test_extended_math_functions(self):
+        """Extended math-function whitelist should be parseable/evaluable."""
+        config = {'parameters': {}}
+        evaluator = FormulaEvaluator(config)
+
+        result = evaluator.evaluate_formula("asin(1)", {})
+        assert abs(result - 1.5707963267948966) < 1e-12
+
+        result = evaluator.evaluate_formula("cosh(0)", {})
+        assert abs(result - 1.0) < 1e-12
+
+        result = evaluator.evaluate_formula("floor(2.9) + ceil(2.1)", {})
+        assert abs(result - 5.0) < 1e-12
+
+        result = evaluator.evaluate_formula("max(2, min(5, 3))", {})
+        assert abs(result - 3.0) < 1e-12
+
+    def test_math_function_registry_contains_expected_entries(self):
+        """Exported math-function registry should include common supported names."""
+        names = get_math_function_names()
+        for expected in ('exp', 'sqrt', 'asin', 'tanh', 'ceil', 'floor', 'min', 'max'):
+            assert expected in names
     
     def test_complex_formula_canfield_style(self):
         """Test complex formula similar to Canfield model"""
@@ -337,6 +375,50 @@ class TestFormulaEvaluatorIntegration:
         assert abs(result['K_mnco3'] - (10 ** -8.5)) < 1e-15
         assert abs(result['K_feco3'] - (10 ** -8.4)) < 1e-15
         assert abs(result['K_fes'] - (10 ** -2.2)) < 1e-15
+
+    def test_all_parameter_subsections_are_evaluated_uniformly(self):
+        """All parameters.* subsections should support formulas regardless of subsection name."""
+        config = {
+            'parameters': {
+                'physical': {
+                    'Pi': 3.141592653589793,
+                    'por0': '0.39*0.86',
+                },
+                'transport_like': {
+                    'scale': '2*por0',
+                },
+                'biogeochemical': [
+                    {'name': 'vol_g', 'value': 'Pi*2.05^2*0.5*por0/1000.0'},
+                ],
+            }
+        }
+
+        evaluator = FormulaEvaluator(config)
+        result = evaluator.evaluate_all()
+
+        assert abs(result['por0'] - (0.39 * 0.86)) < 1e-12
+        assert abs(result['scale'] - (2 * 0.39 * 0.86)) < 1e-12
+        expected_vol_g = 3.141592653589793 * (2.05 ** 2) * 0.5 * (0.39 * 0.86) / 1000.0
+        assert abs(result['vol_g'] - expected_vol_g) < 1e-12
+
+    def test_list_style_parameter_subsection_not_named_biogeochemical(self):
+        """List syntax with name/value should work in arbitrary subsection names."""
+        config = {
+            'parameters': {
+                'constants': {'a': 2.0},
+                'custom_group': [
+                    {'name': 'b', 'value': 'a + 3'},
+                    {'name': 'c', 'value': 'b * 2'},
+                ],
+            }
+        }
+
+        evaluator = FormulaEvaluator(config)
+        result = evaluator.evaluate_all()
+
+        assert result['a'] == 2.0
+        assert result['b'] == 5.0
+        assert result['c'] == 10.0
 
 
 class TestStoichiometryEvaluation:

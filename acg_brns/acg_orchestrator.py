@@ -19,14 +19,15 @@ import yaml
 import os
 import re
 
-from sympy import (Symbol, symbols, sympify, nsimplify,
-                   sqrt, log, exp, sin, cos, tan, Abs as SymAbs)
+from sympy import Symbol, symbols, sympify, nsimplify
 
 from acg_brns.formula_evaluator import (
     FormulaEvaluator,
     FormulaEvaluationError,
     CircularDependencyError,
     UndefinedVariableError,
+    get_math_function_names,
+    get_math_function_namespace,
 )
 from acg_brns.yaml_to_acg_mapper import YAMLtoACGMapper
 from acg_brns.acg import ACGModule
@@ -209,29 +210,40 @@ class ACGOrchestrator:
             ))
             params = {}
 
-        bio_cfg = params.get('biogeochemical', []) if isinstance(params, dict) else []
-        if not isinstance(bio_cfg, list):
-            issues.append(ValidationIssue(
-                'ERROR', 'parameters.biogeochemical',
-                "'parameters.biogeochemical' must be a list.",
-                "Example: biogeochemical: [{name: kox, value: 0.1}]"
-            ))
+        if isinstance(params, dict):
+            for section_name, section_data in params.items():
+                section_path = f"parameters.{section_name}"
+                if isinstance(section_data, dict):
+                    continue
+                if isinstance(section_data, list):
+                    for i, item in enumerate(section_data):
+                        item_path = f"{section_path}[{i}]"
+                        if not isinstance(item, dict):
+                            issues.append(ValidationIssue(
+                                'ERROR', item_path,
+                                "List-style parameter entries must be mappings.",
+                                "Example: - {name: kox, value: 0.1}"
+                            ))
+                            continue
+                        if 'name' not in item or not isinstance(item.get('name'), str):
+                            issues.append(ValidationIssue(
+                                'ERROR', f"{item_path}.name",
+                                "'name' is required and must be a string.",
+                                "Example: name: kox"
+                            ))
+                        if 'value' not in item:
+                            issues.append(ValidationIssue(
+                                'ERROR', f"{item_path}.value",
+                                "'value' is required for list-style parameter entries.",
+                                "Example: value: 0.1"
+                            ))
+                    continue
 
-        physical_cfg = params.get('physical', {}) if isinstance(params, dict) else {}
-        if not isinstance(physical_cfg, dict):
-            issues.append(ValidationIssue(
-                'ERROR', 'parameters.physical',
-                "'parameters.physical' must be a mapping.",
-                "Example: physical: {por0: 0.8}"
-            ))
-
-        stoich_cfg = params.get('stoichiometry', {}) if isinstance(params, dict) else {}
-        if not isinstance(stoich_cfg, dict):
-            issues.append(ValidationIssue(
-                'ERROR', 'parameters.stoichiometry',
-                "'parameters.stoichiometry' must be a mapping.",
-                "Example: stoichiometry: {x: 1, y: 2, z: 3}"
-            ))
+                issues.append(ValidationIssue(
+                    'ERROR', section_path,
+                    "Each parameters subsection must be either a mapping or a list.",
+                    "Examples: physical: {por0: 0.8} or biogeochemical: [{name: kox, value: 0.1}]"
+                ))
 
         optional_mapping_sections = {
             'grid': "Example: grid: {nnodes: 100, depth_max: 1.0}",
@@ -398,6 +410,61 @@ class ACGOrchestrator:
         s = re.sub(r'(?<![A-Za-z0-9_])\d+\.?\d*(?![A-Za-z0-9_])', '', s)
         return set(re.findall(r'[A-Za-z_][A-Za-z0-9_]*', s))
 
+    @staticmethod
+    def _extract_function_calls(expr_str: str) -> set:
+        """Extract function-like identifiers used as name(...)."""
+        return set(re.findall(r'\b([A-Za-z_][A-Za-z0-9_]*)\s*\(', str(expr_str)))
+
+    @staticmethod
+    def _iter_parameter_entries(params_cfg: Dict[str, Any]):
+        """
+        Iterate parameter entries across all `parameters.*` subsections.
+
+        Yields tuples of:
+            (section_name, parameter_name, parameter_value, value_path)
+        """
+        if not isinstance(params_cfg, dict):
+            return
+
+        for section_name, section_data in params_cfg.items():
+            if isinstance(section_data, dict):
+                for pname, pvalue in section_data.items():
+                    if isinstance(pname, str):
+                        yield section_name, pname, pvalue, f"parameters.{section_name}.{pname}"
+            elif isinstance(section_data, list):
+                for i, item in enumerate(section_data):
+                    if not isinstance(item, dict):
+                        continue
+                    pname = item.get('name')
+                    if isinstance(pname, str) and 'value' in item:
+                        yield section_name, pname, item.get('value'), f"parameters.{section_name}[{i}].value"
+
+    @staticmethod
+    def _collect_parameter_names(params_cfg: Dict[str, Any]) -> Set[str]:
+        """
+        Collect parameter names across all `parameters.*` subsections.
+
+        Supported per-subsection syntaxes:
+        - Mapping style: key/value pairs
+        - List style: entries with `name` and `value`
+        """
+        names: Set[str] = set()
+        if not isinstance(params_cfg, dict):
+            return names
+
+        for section_data in params_cfg.values():
+            if isinstance(section_data, dict):
+                names |= {k for k in section_data.keys() if isinstance(k, str)}
+            elif isinstance(section_data, list):
+                for item in section_data:
+                    if not isinstance(item, dict):
+                        continue
+                    pname = item.get('name')
+                    if isinstance(pname, str) and 'value' in item:
+                        names.add(pname)
+
+        return names
+
     def _validate_references(self) -> List[ValidationIssue]:
         """Check uniqueness of names/IDs and forward references."""
         issues: List[ValidationIssue] = []
@@ -428,21 +495,10 @@ class ACGOrchestrator:
             seen_species.add(name)
         known_species = set(species_names)
 
-        # Build complete known-symbol set (species + all parameters)
-        bio_params: List[str] = [
-            p['name']
-            for p in params.get('biogeochemical', [])
-            if isinstance(p, dict) and isinstance(p.get('name'), str)
-        ]
-        stoich_cfg = params.get('stoichiometry', {})
-        if not isinstance(stoich_cfg, dict):
-            stoich_cfg = {}
-        physical_cfg = params.get('physical', {})
-        if not isinstance(physical_cfg, dict):
-            physical_cfg = {}
-        stoich_params: List[str] = list(stoich_cfg.keys())
-        physical_params: List[str] = list(physical_cfg.keys())
-        known_params = set(bio_params) | set(stoich_params) | set(physical_params)
+        known_math_functions = get_math_function_names()
+
+        # Build complete known-symbol set (species + all parameters subsections)
+        known_params = self._collect_parameter_names(params)
         known_symbols = known_species | known_params
 
         # Add computed_values keys (all nested subsections) to known_symbols so that
@@ -453,22 +509,16 @@ class ACGOrchestrator:
                 if isinstance(_subsect, dict):
                     known_symbols |= {k for k in _subsect if isinstance(k, str)}
 
-        # R-6: biogeochemical parameter name uniqueness
-        seen_bio: set = set()
-        bio_cfg = params.get('biogeochemical', [])
-        if not isinstance(bio_cfg, list):
-            bio_cfg = []
-        for i, p in enumerate(bio_cfg):
-            if not isinstance(p, dict):
-                continue
-            pname = p.get('name', '')
-            if pname in seen_bio:
+        # R-6: parameter name uniqueness across all parameters subsections
+        seen_param_names: Set[str] = set()
+        for _, pname, _, value_path in self._iter_parameter_entries(params):
+            if pname in seen_param_names:
                 issues.append(ValidationIssue(
-                    'ERROR', f"parameters.biogeochemical[{i}].name",
-                    f"Parameter name '{pname}' is not unique.",
-                    "Use each parameter name only once."
+                    'ERROR', value_path,
+                    f"Parameter name '{pname}' is not unique across parameters subsections.",
+                    "Use each parameter name only once in parameters.*."
                 ))
-            seen_bio.add(pname)
+            seen_param_names.add(pname)
 
         reactions = cfg.get('reactions', [])
         if not isinstance(reactions, list):
@@ -520,7 +570,18 @@ class ACGOrchestrator:
             # R-4: equilibrium_constraint references known species
             ec = rxn.get('equilibrium_constraint')
             if ec is not None:
+                call_names = self._extract_function_calls(ec)
+                for call_name in call_names:
+                    if call_name not in known_math_functions:
+                        issues.append(ValidationIssue(
+                            'WARNING', f"{path}.equilibrium_constraint",
+                            f"Unknown function '{call_name}' in equilibrium_constraint of reaction {rid}.",
+                            "Function is not in supported math whitelist and may fail during formula parsing/evaluation."
+                        ))
+
                 for token in self._extract_tokens(str(ec)):
+                    if token in known_math_functions or token in call_names:
+                        continue
                     if token not in known_symbols:
                         issues.append(ValidationIssue(
                             'ERROR', f"{path}.equilibrium_constraint",
@@ -536,7 +597,17 @@ class ACGOrchestrator:
 
             rate_val = rxn.get('rate')
             if rate_val is not None and isinstance(rate_val, str):
+                call_names = self._extract_function_calls(rate_val)
+                for call_name in call_names:
+                    if call_name not in known_math_functions:
+                        issues.append(ValidationIssue(
+                            'WARNING', f"{path}.rate",
+                            f"Unknown function '{call_name}' in rate of reaction {rid}.",
+                            "Function is not in supported math whitelist and may fail during formula parsing/evaluation."
+                        ))
                 for token in self._extract_tokens(rate_val):
+                    if token in known_math_functions or token in call_names:
+                        continue
                     if token not in local_known:
                         issues.append(ValidationIssue(
                             'ERROR', f"{path}.rate",
@@ -547,7 +618,18 @@ class ACGOrchestrator:
             if isinstance(rate_components, dict):
                 for comp_name, comp_val in rate_components.items():
                     if comp_val is not None and isinstance(comp_val, str):
+                        call_names = self._extract_function_calls(comp_val)
+                        for call_name in call_names:
+                            if call_name not in known_math_functions:
+                                issues.append(ValidationIssue(
+                                    'WARNING',
+                                    f"{path}.rate_components.{comp_name}",
+                                    f"Unknown function '{call_name}' in rate_components.{comp_name} of reaction {rid}.",
+                                    "Function is not in supported math whitelist and may fail during formula parsing/evaluation."
+                                ))
                         for token in self._extract_tokens(comp_val):
+                            if token in known_math_functions or token in call_names:
+                                continue
                             if token not in local_known:
                                 issues.append(ValidationIssue(
                                     'ERROR',
@@ -564,7 +646,17 @@ class ACGOrchestrator:
             for fname in ('bc_upper_value', 'bc_lower_value', 'init_value'):
                 val = sp.get(fname)
                 if isinstance(val, str):
+                    call_names = self._extract_function_calls(val)
+                    for call_name in call_names:
+                        if call_name not in known_math_functions:
+                            issues.append(ValidationIssue(
+                                'WARNING', f"species[{i}].{fname}",
+                                f"Unknown function '{call_name}' in {fname} of species '{sp_name}'.",
+                                "Function is not in supported math whitelist and may fail during formula parsing/evaluation."
+                            ))
                     for token in self._extract_tokens(val):
+                        if token in known_math_functions or token in call_names:
+                            continue
                         if token not in known_symbols:
                             issues.append(ValidationIssue(
                                 'ERROR', f"species[{i}].{fname}",
@@ -582,11 +674,7 @@ class ACGOrchestrator:
         if not isinstance(params, dict):
             params = {}
 
-        _math_ns: dict = {
-            'sqrt': sqrt, 'log': log,
-            'log10': lambda x: log(x, 10), 'ln': log,
-            'exp': exp, 'sin': sin, 'cos': cos, 'tan': tan, 'abs': SymAbs,
-        }
+        _math_ns = get_math_function_namespace()
 
         def _preprocess(s: str) -> str:
             s = re.sub(
@@ -602,47 +690,30 @@ class ACGOrchestrator:
             except Exception as exc:
                 return str(exc)[:200]
 
-        bio_params = params.get('biogeochemical', [])
-        if not isinstance(bio_params, list):
-            bio_params = []
+        # F-1: formula syntax in all parameters subsections
+        param_formula_by_name: Dict[str, str] = {}
+        param_formula_path_by_name: Dict[str, str] = {}
+        all_param_names = self._collect_parameter_names(params)
 
-        # F-1: biogeochemical parameter value formulas
-        for i, p in enumerate(bio_params):
-            if isinstance(p, dict):
-                val = p.get('value')
-                if isinstance(val, str):
-                    err = _try_parse(val)
-                    if err:
-                        pname = p.get('name', f'[{i}]')
-                        issues.append(ValidationIssue(
-                            'ERROR', f"parameters.biogeochemical[{i}].value",
-                            f"Formula for parameter '{pname}' is not syntactically parseable.",
-                            err
-                        ))
+        for _, pname, pval, value_path in self._iter_parameter_entries(params):
+            if isinstance(pval, str):
+                err = _try_parse(pval)
+                if err:
+                    issues.append(ValidationIssue(
+                        'ERROR', value_path,
+                        f"Formula for parameter '{pname}' is not syntactically parseable.",
+                        err
+                    ))
 
-        # F-2: detect circular dependencies among biogeochemical formulas
-        name_to_index: Dict[str, int] = {}
-        deps: Dict[str, Set[str]] = {}
-        for i, p in enumerate(bio_params):
-            if not isinstance(p, dict):
-                continue
-            pname = p.get('name')
-            if not isinstance(pname, str):
-                continue
-            name_to_index[pname] = i
-            deps[pname] = set()
+                if pname not in param_formula_by_name:
+                    param_formula_by_name[pname] = pval
+                    param_formula_path_by_name[pname] = value_path
 
-        bio_names = set(name_to_index.keys())
-        for p in bio_params:
-            if not isinstance(p, dict):
-                continue
-            pname = p.get('name')
-            if not isinstance(pname, str):
-                continue
-            expr = p.get('value')
-            if isinstance(expr, str):
-                tokens = self._extract_tokens(expr)
-                deps[pname] = {tok for tok in tokens if tok in bio_names}
+        # F-2: detect circular dependencies among all parameter formulas
+        deps: Dict[str, Set[str]] = {name: set() for name in param_formula_by_name.keys()}
+        for pname, expr in param_formula_by_name.items():
+            tokens = self._extract_tokens(expr)
+            deps[pname] = {tok for tok in tokens if tok in all_param_names}
 
         visited: Dict[str, int] = {}  # 0=unseen, 1=visiting, 2=done
         stack: List[str] = []
@@ -667,8 +738,8 @@ class ACGOrchestrator:
                         reported_cycles.add(cycle_key)
                         pretty = ' -> '.join(cycle)
                         issues.append(ValidationIssue(
-                            'ERROR', f"parameters.biogeochemical[{name_to_index.get(nxt, 0)}].value",
-                            f"Circular dependency detected in biogeochemical formulas: {pretty}.",
+                            'ERROR', param_formula_path_by_name.get(nxt, 'parameters'),
+                            f"Circular dependency detected in parameter formulas: {pretty}.",
                             "Check dependency order and remove cyclic references."
                         ))
             stack.pop()
@@ -842,23 +913,42 @@ class ACGOrchestrator:
             physical = {}
         phys_names = list(physical.keys())
         phys_vals = []
-        
-        # Ensure all physical values are numeric (convert strings to float if needed)
-        for val in physical.values():
+
+        # Prefer evaluator outputs so physical formulas like "0.39*0.86" are
+        # already numeric by code-generation time.
+        evaluated = self.evaluated_params if isinstance(self.evaluated_params, dict) else {}
+
+        for pname, raw_val in physical.items():
+            val = evaluated.get(pname, raw_val)
+
+            if isinstance(val, (int, float)):
+                phys_vals.append(float(val))
+                continue
+
             if isinstance(val, str):
+                # Fast path: plain numeric strings
                 try:
                     phys_vals.append(float(val))
-                except (ValueError, TypeError) as e:
-                    raise ACGOrchestrationError(
-                        f"Physical parameter value '{val}' cannot be converted to float: {e}"
-                    )
-            elif isinstance(val, (int, float)):
-                phys_vals.append(float(val))
-            else:
-                raise ACGOrchestrationError(
-                    f"Physical parameter value '{val}' has unsupported type {type(val).__name__}. "
-                    "Expected numeric value or evaluable string."
-                )
+                    continue
+                except (ValueError, TypeError):
+                    pass
+
+                # Fallback: evaluate the expression string in current context
+                if self.evaluator is not None:
+                    try:
+                        evaluated_val = self.evaluator.evaluate_formula(val, evaluated)
+                        phys_vals.append(float(evaluated_val))
+                        continue
+                    except Exception as e:
+                        raise ACGOrchestrationError(
+                            f"Physical parameter '{pname}' with value '{val}' "
+                            f"could not be evaluated to float: {e}"
+                        )
+
+            raise ACGOrchestrationError(
+                f"Physical parameter '{pname}' has unsupported/non-numeric value '{val}' "
+                f"(type {type(val).__name__})."
+            )
 
         phys_names2 = ['iq', 'iw', 'iDb', 'ipor', 'igrid', 'iarea', 'ic']
         phys_flags = params_cfg.get('physical_flags', {})
@@ -1018,12 +1108,11 @@ class ACGOrchestrator:
             sym_map = {str(v): Symbol(str(v)) for v in self.acg_data['variables']}
             for pname in self.acg_data.get('bio_name', []):
                 sym_map[str(pname)] = Symbol(str(pname))
-            for section in ('physical', 'stoichiometry'):
-                section_cfg = params_cfg.get(section, {})
-                if not isinstance(section_cfg, dict):
-                    section_cfg = {}
-                for pname in section_cfg.keys():
-                    sym_map[str(pname)] = Symbol(str(pname))
+            for pname in self._collect_parameter_names(params_cfg):
+                sym_map[str(pname)] = Symbol(str(pname))
+            if isinstance(self.evaluated_params, dict):
+                for pname in self.evaluated_params.keys():
+                    sym_map.setdefault(str(pname), Symbol(str(pname)))
 
             raw_constraints_by_id = {}
             for raw_rxn in (self.config.get('reactions', []) if self.config else []):
@@ -1309,12 +1398,24 @@ class ACGOrchestrator:
         params['tot_time'] = time_cfg.get('total', 1.0)
         params['delt'] = time_cfg.get('step', 0.1)
         
-        # Physical parameters
+        # Physical/environment aliases (prefer evaluated generic parameters)
         physical = params_cfg.get('physical', {})
         if not isinstance(physical, dict):
             physical = {}
-        params['T_C'] = physical.get('temperature', 20.0)
-        params['S'] = physical.get('salinity', 35.0)
+        eval_params = self.evaluated_params if isinstance(self.evaluated_params, dict) else {}
+
+        t_raw = eval_params.get('T_C', eval_params.get('t_celsius', physical.get('T_C', physical.get('temperature', 20.0))))
+        s_raw = eval_params.get('S', eval_params.get('salin', physical.get('S', physical.get('salinity', 35.0))))
+
+        try:
+            params['T_C'] = float(t_raw)
+        except (TypeError, ValueError):
+            params['T_C'] = 20.0
+
+        try:
+            params['S'] = float(s_raw)
+        except (TypeError, ValueError):
+            params['S'] = 35.0
         
         # Output configuration - derived from per-species/reaction output flags
         output_cfg = self._get_mapping_section('output', {})
@@ -1376,6 +1477,9 @@ class ACGOrchestrator:
 
         init_cfg = self._get_mapping_section('initial_conditions', {})
         mode = init_cfg.get('mode', None)
+        if mode is None:
+            if isinstance(self.evaluated_params, dict):
+                mode = self.evaluated_params.get('ic', None)
         if mode is None:
             params_cfg = self._get_parameters_mapping()
             phys_flags = params_cfg.get('physical_flags', {})
@@ -1613,8 +1717,8 @@ def main():
     import sys
     
     # Default paths
-    yaml_path = 'models/canfield_refactored.yaml'
-    output_dir = 'build/fortran/canfield'
+    yaml_path = 'models/equilibrium/equilibrium.yaml'
+    output_dir = 'build/fortran/equilibrium'
     
     # Parse command line arguments
     if len(sys.argv) > 1:
