@@ -1,32 +1,25 @@
 site_name: BRNS
 site_description: "Biogeochemical Reaction Network Simulator"
-site_url: "https://jtecklenburg.github.io/BRNS/"
-repo_url: "https://github.com/jtecklenburg/BRNS"
-repo_name: "jtecklenburg/BRNS"
 
 theme:
-  name: material
-  palette:
-    primary: teal
-    accent: blue grey
-  features:
-    - navigation.sections
-    - navigation.expand
-    - navigation.top
-    - toc.follow
+    name: "material"
+    palette:
+        primary: "cyan"
+        accent: "grey"
 
 plugins:
-  - search
-  - mkdocstrings:
-      default_handler: python
+    - search
+    - mkdocstrings:
+        default_handler: python
+    - mkdocs-jupyter:
+        execute: true
 
 markdown_extensions:
-  - pymdownx.highlight
-  - pymdownx.superfences
+    - pymdownx.highlight
+    - pymdownx.superfences
 
 nav:
-  - Start: index.md
-  - API:
-      - acg: api_acg.md
-      - gaussian_elimination: api_gaussian_elimination.md
-      - acg_orchestrator: api_acg_orchestrator.md
+    - "Start": index.md
+    - "acg": api_acg.md
+    - "gaussian_elimination": api_gaussian_elimination.md
+    - "acg_orchestrator": api_acg_orchestrator.md
