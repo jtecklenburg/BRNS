@@ -1,0 +1,26 @@
+site_name: ACG-BRNS
+site_description: "Automatic code generation for BRNS from YAML models."
+site_url: "https://jtecklenburg.github.io/BRNSPackage/"
+repo_url: "https://github.com/jtecklenburg/BRNSPackage"
+repo_name: "jtecklenburg/BRNSPackage"
+
+theme:
+  name: material
+  palette:
+    primary: teal
+    accent: blue grey
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+
+nav:
+  - Start: index.md
+  - API acg: api_acg.md
+  - API gaussian_elimination: api_gaussian_elimination.md
+  - API acg_orchestrator: api_acg_orchestrator.md

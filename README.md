@@ -1,4 +1,5 @@
 # ACG-BRNS
+![GitHub License](https://img.shields.io/github/license/jtecklenburg/BRNS)
 
 Automatic code generation for BRNS: convert YAML-based biogeochemical models into BRNS-compatible Fortran source files.
 
