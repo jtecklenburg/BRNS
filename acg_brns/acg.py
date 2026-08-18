@@ -531,7 +531,7 @@ class ACGModule:
         The Jacobian from p10 already contains:
         pd(i,j) = ∂R_i/∂C_j                    for i ≠ j
         pd(i,i) = ∂R_i/∂C_i - 1/delt          for reactive rows
-        pd(i,j) = conservation_basis[k][j]    for conservation rows
+        pd(i,j) = conservation_basis[k,j]     for conservation rows
 
         Maple equivalent: acg5(pd, dir_f) - just writes the Jacobian to file
 

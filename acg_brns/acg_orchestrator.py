@@ -13,7 +13,7 @@ Date: 2026-03-03
 """
 
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Set
+from typing import Dict, List, Any, Optional, Set, Tuple
 from dataclasses import dataclass, field
 import yaml
 import os
@@ -905,7 +905,7 @@ class ACGOrchestrator:
 
         return normalized
 
-    def _extract_physical_codegen_data(self) -> tuple[list, list, list, list]:
+    def _extract_physical_codegen_data(self) -> Tuple[List, List, List, List]:
         """Build physical parameter arrays for acg0/acg8 consistently."""
         params_cfg = self._get_parameters_mapping()
         physical = params_cfg.get('physical', {})
