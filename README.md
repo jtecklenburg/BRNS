@@ -1,61 +1,88 @@
-# ACG-BRNS
+# BRNS – Biogeochemical Reaction Network Simulator
 ![GitHub License](https://img.shields.io/github/license/jtecklenburg/BRNS)
 
-Automatic code generation for BRNS: convert YAML-based biogeochemical models into BRNS-compatible Fortran source files.
+BRNS (**Biogeochemical Reaction Network Simulator**) is a flexible modelling framework for simulating coupled, multi-component reaction networks in porous media. It combines an automatic code generator (ACG) with a compiled Fortran simulation core, allowing to define arbitrarily complex kinetic and equilibrium reaction networks without hand-writing solver code for every new problem.
 
-## BRNS stands for **Biogeochemical Reaction Network Simulator**.
 
-It is a process-based modeling framework used to simulate coupled transport-reaction systems in sediments and aquatic geochemical environments. In practice, BRNS solves multi-species reaction-transport equations (advection, diffusion/bioturbation, and biogeochemical source/sink terms) and relies on user/model-specific Fortran routines for rates, Jacobians, boundary conditions, and initial conditions.
+---
 
-ACG-BRNS generates these model-specific Fortran files automatically from YAML model definitions.
+## What is BRNS?
 
-## Overview
+BRNS was originally developed to simulate early diagenetic processes in marine sediments, where large numbers of biogeochemical reactions (organic matter degradation, redox cycling of iron, manganese and sulfur, nutrient cycling, pH buffering, etc.) need to be solved simultaneously with transport processes such as diffusion, advection, bioturbation and bioirrigation.
 
-ACG-BRNS is a Python pipeline for BRNS model development.
+Rather than requiring users to write custom solver code for each reaction network, BRNS uses an **automatic code generator** to translate a user-defined reaction network into ready-to-compile simulation code. This makes BRNS a flexible tool for anyone who needs to couple a reaction network to a transport model, without becoming a numerical-methods specialist first.
 
-It provides:
-- YAML model parsing and validation
-- symbolic formula handling (SymPy)
-- Jacobian/residual generation
-- Gaussian-elimination-based preprocessing
-- Fortran code generation (BRNS-compatible fixed-format files)
+## What has BRNS been used for?
 
-The project is intended as a Maple-free workflow for building BRNS model code from reproducible YAML configurations.
+Since its introduction, BRNS and its derivatives have been applied to a wide range of subsurface and sediment biogeochemistry problems, including:
 
-## Current Workflow (Recommended)
+- Early diagenesis and redox cycling of carbon, nitrogen, iron, manganese and sulfur in marine sediments [Regnier et al., 2002; Thullner et al., 2005]
+- pH dynamics and proton budgets in aquatic sediments [Jourabchi et al., 2005]
+- Anaerobic oxidation of methane (AOM) and sulfate-methane transition zones [Blouet et al., 2021]
+- Methane hydrate stability and benthic methane escape under permafrost thaw [Sivan et al., 2020]
+- Coupling with multidimensional flow and transport codes (e.g. OpenGeoSys, OpenFOAM) for groundwater and pore-scale reactive transport [Centler et al., 2010; Golparvar et al., 2024]
+- Redox transformations of trace metals and contaminants (e.g. uranium, arsenic) [e.g. sensitivity analysis of uranium reduction, 2025]
 
-1. Define or edit a model YAML in [models](models).
-2. Generate Fortran files (Notebook or script).
-3. Build and run the generated model.
-4. Compare or plot results with notebooks.
+A curated bibliography of BRNS-related publications and applications is being can be found in the project documentation (`docs/`). 
+
+---
+
+## How BRNS works
+
+BRNS follows a three-step workflow:
+
+1. **Define a reaction network.**
+   You specify the species, kinetic and equilibrium reactions, and stoichiometry of your problem in a configuration file.
+
+2. **Generate problem-specific Fortran code (ACG).**
+   The Automatic Code Generator (ACG) reads your reaction network definition and generates the Fortran source files needed to solve that specific system (mass balances, Jacobian, Newton–Raphson solver routines, etc.).
+
+3. **Compile the generated Fortran code.**
+   Compiling the generated files produces a problem-specific simulator. You can use it in two ways:
+   - **Stand-alone console program** — run BRNS directly as a batch reaction-transport solver for 1D problems.
+   - **Compiled library** — link BRNS against an external transport code (e.g. a groundwater flow and transport model), so BRNS handles the reaction step while the host code handles transport.
+
+### What's new in this version
+
+Earlier versions of BRNS generated Fortran code from a **Maple** worksheet, which required a Maple license and was difficult to script or version-control. **This version replaces the Maple-based ACG with a Python-based code generator.** Reaction networks are now defined in a plain-text **YAML** file instead of a Maple notebook, making the workflow:
+
+- free of proprietary software dependencies for the code-generation step,
+- easier to script, version-control and share, and
+- more approachable for users without a Maple background.
+
+---
 
 ## Installation
 
-From source:
+BRNS requires two components to be installed, in the following order:
+
+### 1. Install `macrofor`
 
 ```bash
-cd BRNSPackage
-pip install -e .
+pip install "macrofor @ git+https://github.com/jtecklenburg/macrofor.git"
 ```
 
-Optional extras:
+### 2. Install BRNS
 
 ```bash
-# Dev tools
-pip install -e ".[dev]"
-
-# Notebook support
-pip install -e ".[notebooks]"
-
-# Everything
-pip install -e ".[dev,notebooks]"
+pip install "BRNS @ git+https://github.com/jtecklenburg/BRNS.git"
 ```
 
-## CLI / Script-Based Usage
+---
 
-### Build and run a single YAML model
+## Usage
 
-Use [build_python.sh](build_python.sh):
+### 1. Define your reaction network
+
+Create a YAML file describing your species and reactions.
+
+```yaml
+# TODO: add minimal example YAML reaction network
+```
+
+### 2. Run the code generator
+
+#### Option A: script based usage to build and run a single YAML model
 
 ```bash
 ./build_python.sh -c ./models/single_species_example.yaml -i ./path/to/input_files
@@ -73,9 +100,7 @@ This script performs:
 3. Fortran compilation (`gfortran`)
 4. model execution and result collection (`.dat`)
 
-## Python API Usage
-
-High-level YAML pipeline:
+#### Option B: Python API Usage
 
 ```python
 from acg_brns.acg_orchestrator import ACGOrchestrator
@@ -88,94 +113,52 @@ orchestrator = ACGOrchestrator(
 
 summary = orchestrator.generate()
 print(summary)
-```
 
-Low-level generation APIs are still available via `ACGModule` for advanced/custom flows.
-
-## Notebook Guide
-
-Main notebooks in [notebooks](notebooks):
-
-- [generate_fortran_from_yaml.ipynb](notebooks/generate_fortran_from_yaml.ipynb)
-    - focused YAML → Fortran generation walkthrough
-- [generate_fortran_debug.ipynb](notebooks/generate_fortran_debug.ipynb)
-    - advanced/debug-oriented pipeline inspection
-- [compare_results.ipynb](notebooks/compare_results.ipynb)
-    - compare two result directories (e.g., reference vs Python)
-- [plot_results.ipynb](notebooks/plot_results.ipynb)
-    - plot results from a single version
-- [gaussian_elimination_tutorial.ipynb](notebooks/gaussian_elimination_tutorial.ipynb)
-    - preprocessing and elimination concepts
-
-## Typical Output Files
-
-Generated BRNS user files usually include (model-dependent):
-- `rates.f`
-- `jacobian.f`
-- `residual.f`
-- `ssrates.f`
-- `boundaries.f`
-- `initialcond.f`
-- `output.f`
-- include/config files such as `common_geo.inc`
-
-## Requirements
-
-Core:
-- Python >= 3.8
-- SymPy >= 1.12
-- NumPy >= 1.20
-
-Build/runtime tools (for full BRNS run flow):
-- `gfortran`
-- BLAS/LAPACK libraries
-
-## Project Structure
-
-- [acg_brns](acg_brns): Python generation pipeline
-- [models](models): YAML model definitions
-- [generated_fortran](generated_fortran): generated Fortran outputs
-- [build](build) / `build_output`: compiled runs and results
-- [notebooks](notebooks): interactive workflows (generation/diagnostics/plotting)
-- [reference_fortran](reference_fortran): reference model code
-
-## Development
+### 3. Compile the generated simulator
 
 ```bash
-# Tests
-pytest
-
-# Coverage
-pytest --cov=acg_brns --cov-report=html
-
-# Formatting
-black acg_brns/ tests/
-
-# Linting
-flake8 acg_brns/ tests/
+# TODO: add compilation instructions (Makefile / build script)
 ```
+
+### 4. Run BRNS
+
+- As a **stand-alone console program**:
+  ```bash
+  # TODO: add example run command
+  ```
+- As a **library**, linked into a transport code:
+  ```text
+  # TODO: add linking / API instructions
+  ```
+
+---
+
+## Documentation
+
+Full documentation, including a complete literature list of BRNS applications, tutorials, and a description of the YAML reaction network schema, is under development and will be added under `docs/`.
+
+---
+
+## References
+
+The original BRNS concept and code base were introduced and developed in the following foundational publications:
+
+- Regnier, P., O'Kane, J.P., Steefel, C.I. and Vanderborght, J.P., 2002. Modeling complex multi-component reactive-transport systems: towards a simulation environment based on the concept of a Knowledge Base. *Applied Mathematical Modelling*.
+
+- Aguilera, D.R., Jourabchi, P., Spiteri, C. and Regnier, P., 2005. A knowledge-based reactive transport approach for the simulation of biogeochemical dynamics in Earth systems. *Geochemistry, Geophysics, Geosystems*, 6(7).
+
+A more complete, continuously updated bibliography of BRNS-based studies can be found in the project documentation.
+
+---
+
+## Contributing
+
+Please contact Martin.Thullner@bgr.de.
 
 ## License
 
 MIT License. See [LICENSE](LICENSE).
 
-## Literature
-
-- Regnier, P., Jourabchi, P., & Slomp, C.P. (2003). *Reactive-transport modeling as a technique for understanding coupled biogeochemical processes in surface and subsurface environments*. *Netherlands Journal of Geosciences*, 82(1), 5–18.
-
-- Regnier, P.,O’Kane,J.,Steefel,C.,Vanderborght,J.,2002. Modelingcomplexmulti-
-component reactive-transportsystems:towardsasimulationenvironment
-based ontheconceptofaknowledgebase.AppliedMathematicalModelling
-26, 913–927.
-
-- Aguilera, D.,Jourabchi,P.,Spiteri,C.,Regnier,P.,2005. Aknowledge-basedreactive
-transport approachforthesimulationofbiogeochemicaldynamicsinearth
-systems. Geochemistry,Geophysics,Geosystems6(Q07012),1–1810.1029/
-2004GC000899.
-
-- Centler, F., Shao, H., Biase, C., Park, C.-H., Regnier, P., Kolditz, O., Thullner, M., (2010). *GeoSysBRNS: a flexible multidimensional reactive transport model for simulating biogeochemical subsurface processes*. Comput. Geosci. 36, 397e405.
 ## Acknowledgments
 
-ACG-BRNS is a Python evolution of the Maple-based BRNS ACG workflow. 
-
-Funded by ptj, Förderprogramm: Geoforschung und Nachhaltigkeit (GEO:N), Förderkennzeichen: 03G0937B (BMFTR)
+BRNS is a Python evolution of the Maple-based BRNS workflow. Funded by ptj, Förderprogramm: Geoforschung und Nachhaltigkeit (GEO:N), Förderkennzeichen: 03G0937B (BMFTR)
