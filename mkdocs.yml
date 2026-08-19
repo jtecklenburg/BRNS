@@ -20,6 +20,7 @@ markdown_extensions:
 
 nav:
     - "Start": index.md
+    - "Literature": references.md
     - "acg": api_acg.md
     - "gaussian_elimination": api_gaussian_elimination.md
     - "acg_orchestrator": api_acg_orchestrator.md
