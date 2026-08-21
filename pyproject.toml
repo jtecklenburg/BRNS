@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Automatic Code Generation for BRNS - Generate Fortran code from symbolic models"
 readme = "README.md"
 authors = [
-    {name = "BRNS Development Team", email = "info@example.com"}
+    {name = "BRNS Development Team", email = "martin.thullner@bgr.de"}
 ]
 license = {text = "MIT"}
 requires-python = ">=3.8"
@@ -44,8 +44,8 @@ notebooks = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jtecklenburg/thermooptiplan"
-Repository = "https://github.com/jtecklenburg/thermooptiplan"
+Homepage = "https://jtecklenburg.github.io/BRNS/"
+Repository = "https://github.com/jtecklenburg/BRNS"
 
 [tool.setuptools]
 packages = ["acg_brns"]

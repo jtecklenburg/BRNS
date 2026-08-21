@@ -1,8 +1,8 @@
 # BRNS – Biogeochemical Reaction Network Simulator
+
 ![GitHub License](https://img.shields.io/github/license/jtecklenburg/BRNS)
 
 BRNS (**Biogeochemical Reaction Network Simulator**) is a flexible modelling framework for simulating coupled, multi-component reaction networks in porous media. It combines an automatic code generator (ACG) with a compiled Fortran simulation core, allowing to define arbitrarily complex kinetic and equilibrium reaction networks without hand-writing solver code for every new problem.
-
 
 ---
 
@@ -64,8 +64,16 @@ pip install "macrofor @ git+https://github.com/jtecklenburg/macrofor.git"
 
 ### 2. Install BRNS
 
+Clone the repository locally to access critical workflow files:
+
+- Fortran files: Required to compile simulator.
+- Bash scripts: Automated build pipelines.
+- Jupyter notebooks: Ready-to-use examples.
+
 ```bash
-pip install "BRNS @ git+https://github.com/jtecklenburg/BRNS.git"
+git clone https://github.com/jtecklenburg/BRNS.git
+cd BRNS
+pip install -e .
 ```
 
 ---
@@ -135,7 +143,7 @@ print(summary)
 
 ## Documentation
 
-Full documentation, including a complete literature list of BRNS applications, tutorials, and a description of the YAML reaction network schema, is under development and will be added under `docs/`.
+The documentation can be found under `docs/` or [online](https://jtecklenburg.github.io/BRNS/).
 
 ---
 
@@ -153,7 +161,7 @@ A more complete, continuously updated bibliography of BRNS-based studies can be 
 
 ## Contributing
 
-Please contact Martin.Thullner@bgr.de.
+When you like to contribute to this project, please contact Martin.Thullner@bgr.de.
 
 ## License
 
@@ -161,4 +169,11 @@ MIT License. See [LICENSE](LICENSE).
 
 ## Acknowledgments
 
-BRNS is a Python evolution of the Maple-based BRNS workflow. Funded by ptj, Förderprogramm: Geoforschung und Nachhaltigkeit (GEO:N), Förderkennzeichen: 03G0937B (BMFTR)
+This project builds upon the work and concepts of several contributors:
+
+- P. Regnier & co-workers: Basic RTM & core concept.
+- Florian Centler & Martin Thullner: Coupling and generalization concept.
+- Florian Centler: Maple 10+ and DLL versions.
+- Jan Tecklenburg: Python version implementation.
+
+The Python based version of BRNS was funded by ptj, Förderprogramm: Geoforschung und Nachhaltigkeit (GEO:N), Förderkennzeichen: 03G0937B (BMFTR)
