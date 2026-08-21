@@ -346,13 +346,7 @@ class ACGOrchestrator:
                         "'id' must be an integer.",
                         "Example: id: 1"
                     ))
-                if 'name' not in rxn:
-                    issues.append(ValidationIssue(
-                        'ERROR', f"{path}.name",
-                        "'name' is missing.",
-                        ""
-                    ))
-                elif not isinstance(rxn['name'], str):
+                if 'name' in rxn and not isinstance(rxn['name'], str):
                     issues.append(ValidationIssue(
                         'ERROR', f"{path}.name",
                         "'name' must be a string.",

@@ -839,6 +839,14 @@ class TestValidationMessages(unittest.TestCase):
         cfg['reactions'][0]['id'] = 'one'
         self._assert_error_contains(cfg, "'id' must be an integer")
 
+    def test_schema_reaction_missing_name_is_allowed(self):
+        """Reaction name is optional and falls back to a generated label."""
+        cfg = self._minimal_config()
+        del cfg['reactions'][0]['name']
+        orch = self._load(cfg)
+        acg_data = orch.map_to_acg_structures()
+        self.assertEqual(acg_data['reactions'][0]['name'], 'reaction_1')
+
     def test_schema_reaction_name_must_be_string(self):
         """Reaction name must be a string."""
         cfg = self._minimal_config()

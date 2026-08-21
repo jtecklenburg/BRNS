@@ -425,9 +425,11 @@ class YAMLtoACGMapper:
         result = []
         
         for reaction in reactions:
+            reaction_id = reaction.get('id')
+            reaction_name = reaction.get('name') or f"reaction_{reaction_id}"
             rxn_data = {
-                'id': reaction.get('id'),
-                'name': reaction.get('name'),
+                'id': reaction_id,
+                'name': reaction_name,
                 'rate_yaml': reaction.get('rate', '')
             }
             
