@@ -31,7 +31,7 @@ class YAMLtoACGMapper:
             evaluated_params: Results from FormulaEvaluator.evaluate_all()
         """
         self.config = yaml_config
-        self.params = evaluated_params
+        self.params = evaluated_params if isinstance(evaluated_params, dict) else {}
         self.species_list = []
         self.species_map = {}
         self.variables = []
