@@ -82,10 +82,76 @@ pip install -e .
 
 ### 1. Define your reaction network
 
-Create a YAML file describing your species and reactions.
+Create a YAML file describing your species, reactions and transport processes. The following example describes the conversion of species $A$ into $B$ under constant advective flow and diffusion:
+
+$$
+A \xrightarrow{k} B,
+\qquad r = kA
+$$
+
+where
+
+$$
+k = 2k_{\mathrm{ref}}.
+$$
+
+At the upper boundary, only species $A$ is supplied at a concentration of 1,
+while the concentration of $B$ is zero. Initially, the concentrations of both
+species are zero throughout the entire model domain.
 
 ```yaml
-# TODO: add minimal example YAML reaction network
+units:
+  L: cm
+  M: arbitrary
+  T: a
+
+structure:
+  nsolids: 0
+  ndissolved: 2
+  nreactions: 1
+  neqrxns: 0
+
+grid:
+  nnodes: 51
+  type: 0
+
+initial_conditions:
+  mode: 3
+
+species:
+  - name: a
+    type: dissolved
+    bc_upper_type: 0
+    bc_upper_value: 1.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    init_value: 0.0
+    transport_D0: 1.0e-9
+
+  - name: b
+    type: dissolved
+    bc_upper_type: 0
+    bc_upper_value: 0.0
+    bc_lower_type: 1
+    bc_lower_value: 0.0
+    init_value: 0.0
+    transport_D0: 1.0e-9
+
+parameters:
+  kinetics:
+    k_ref: 1.0e-3
+    k: "2*k_ref"
+  physical:
+    w0: 1.0e-4
+    por0: 0.3
+    depthmax: 0.1
+    delt: 10.0
+    endt: 1.0e4
+
+reactions:
+  - id: 1
+    rate: "k*a"
+    stoichiometry: {a: -1, b: 1}
 ```
 
 ### 2. Run the code generator
