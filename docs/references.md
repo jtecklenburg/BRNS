@@ -1,45 +1,48 @@
-## When you use BRNS in your publication, please cite:
+# Model description and basic principles
+- Aguilera, D.R., Jourabchi, P., Spiteri, C. and Regnier, P.  2005.  A knowledge-based reactive transport approach for the simulation of biogeochemical dynamics in Earth systems. Geochemistry Geophysics Geosystems 6(7), Q07012.
+- Regnier, P., O'Kane, J.P., Steefel, C.I. and Vanderborght, P.  2002.  Modeling complex multi-component reactive-transport systems: towards a simulation environment based on the concept of a Knowledge Base. Applied Mathematical Modelling 26(9), 913-927.
 
-- Regnier, P., O'Kane, J.P., Steefel, C.I. and Vanderborght, J.P., 2002. Modeling complex multi-component reactive-transport systems: towards a simulation environment based on the concept of a Knowledge Base. *Applied Mathematical Modelling*. [[Link]](https://www.semanticscholar.org/paper/21d8d978da929fbfd768ede900e1c3662fb0b265)
+# Application of stand-alone model
+- Blouet, J.-P., Arndt, S., Imbert, P. and Regnier, P.  2021.  Are seep carbonates quantitative proxies of CH4 leakage? Modeling the influence of sulfate reduction and anaerobic oxidation of methane on pH and carbonate precipitation. Chemical Geology 577.
+- Brigolin, D., Pastres, R., Nickell, T.D., Cromey, C.J., Aguilera, D.R. and Regnier, P.  2009.  Modelling the impact of aquaculture on early diagenetic processes in sea loch sediments. Marine Ecology-Progress Series 388, 63-80.
+- Brigolin, D., Rabouille, C., Bombled, B., Colla, S., Vizzini, S., Pastres, R. and Pranovi, F.  2018.  Modelling biogeochemical processes in sediments from the north-western Adriatic Sea: response to enhanced particulate organic carbon fluxes. Biogeosciences 15(5), 1347-1366.
+- Canavan, R.W., Laverman, A.M. and Slomp, C.P.  2007a.  Modeling nitrogen cycling in a coastal fresh water sediment. Hydrobiologia 584(1), 27-36.
+- Canavan, R.W., Slomp, C.P., Jourabchi, P., Van Cappellen, P., Laverman, A.M. and van den Berg, G.A.  2006.  Organic matter mineralization in sediment of a coastal freshwater lake and response to salinization. Geochimica Et Cosmochimica Acta 70(11), 2836-2855.
+- Canavan, R.W., Van Cappellen, P., Zwolsman, J.J., van den Berg, G.A. and Slomp, C.P.  2007b.  Geochemistry of trace metals in a fresh water sediment: field results and diagenetic modeling. Science of the Total Environment 381(1-3), 263-279.
+- Dale, A.W., Brüchert, V., Alperin, M. and Regnier, P.  2009.  An integrated sulfur isotope model for Namibian shelf sediments. Geochimica Et Cosmochimica Acta 73(7), 1924-1944.
+- Dale, A.W., Van Cappellen, P., Aguilera, D.R. and Regnier, P.  2008.  Methane efflux from marine sediments in passive and active margins: Estimations from bioenergetic reaction–transport simulations. Earth and Planetary Science Letters 265(3-4), 329-344.
+- Freitas, F.S., Pika, P.A., Kasten, S., Jørgensen, B.B., Rassmann, J., Rabouille, C., Thomas, S., Sass, H., Pancost, R.D. and Arndt, S.  2021.  New insights into large-scale trends of apparent organic matter reactivity in marine sediments and patterns of benthic carbon transformation. Biogeosciences 18(15), 4651-4679.
+- Gharasoo, M., Centler, F., Van Cappellen, P., Wick, L.Y. and Thullner, M.  2015.  Kinetics of Substrate Biodegradation under the Cumulative Effects of Bioavailability and Self-Inhibition. Environ Sci Technol 49(9), 5529-5537.
+- Hesse, F., Harms, H., Attinger, S. and Thullner, M.  2010.  Linear Exchange Model for the Description of Mass Transfer Limited Bioavailability at the Pore Scale. Environmental Science & Technology 44(6), 2064-2071.
+- Jourabchi, P., Van Cappellen, P. and Regnier, P.  2005.  Quantitative interpretation of pH distributions in aquatic sediments: A reaction-transport modeling approach. American Journal of Science 305(9), 919-956.
+- Khan, A.M., Wick, L.Y. and Thullner, M.  2018.  Applying the Rayleigh Approach for Stable Isotope-Based Analysis of VOC Biodegradation in Diffusion-Dominated Systems. Environ Sci Technol 52(14), 7785-7795.
+- Krumins, V., Gehlen, M., Arndt, S., Van Cappellen, P. and Regnier, P.  2013.  Dissolved inorganic carbon and alkalinity fluxes from coastal marine sediments: model estimates for different shelf environments and sensitivity to global change. Biogeosciences 10(1), 371-398.
+- Laverman, A.M., Meile, C., Van Cappellen, P. and Wieringa, E.B.  2007.  Vertical distribution of denitrification in an estuarine sediment: integrating sediment flowthrough reactor experiments and microprofiling via reactive transport modeling. Appl Environ Microbiol 73(1), 40-47.
+- Regnier, P., Jourabchi, P. and Slomp, C.P.  2003.  Reactive-transport modeling as a technique for understanding coupled biogeochemical processes in surface and subsurface environments. Netherlands Journal of Geosciences-Geologie En Mijnbouw 82(1), 5-18.
+- Schmidt, S.I., Kreft, J.-U., Mackay, R., Picioreanu, C. and Thullner, M.  2018.  Elucidating the impact of micro-scale heterogeneous bacterial distribution on biodegradation. Advances in Water Resources 116, 67-76.
+- Smith, D.A. and Matisoff, G.  2008.  Sediment Oxygen Demand in the Central Basin of Lake Erie. Journal of Great Lakes Research 34(4), 731-744.
+- Spiteri, C., Regnier, P., Slomp, C.P. and Charette, M.A.  2006.  pH-Dependent iron oxide precipitation in a subterranean estuary. Journal of Geochemical Exploration 88(1-3), 399-403.
+- Spiteri, C., Slomp, C.P., Regnier, P., Meile, C. and Van Cappellen, P.  2007.  Modelling the geochemical fate and transport of wastewater-derived phosphorus in contrasting groundwater systems. Journal of Contaminant Hydrology 92(1-2), 87-108.
+- Stolpovsky, K., Fetzer, I., Van Cappellen, P. and Thullner, M.  2016.  Influence of dormancy on microbial competition under intermittent substrate supply: insights from model simulations. FEMS Microbiol Ecol 92(6), fiw071.
+- Thullner, M., Dale, A.W. and Regnier, P.  2009.  Global-scale quantification of mineralization pathways in marine sediments: A reaction-transport modeling approach. Geochemistry Geophysics Geosystems 10, Q10012.
+- Thullner, M. and Hofstetter, T.B.  2025.  Determining Contributions of Three Different Pathways to Total Degradation of a Contaminant Using Data From Triple-Element Isotope Analysis. Water, Air, & Soil Pollution 236(15).
+- Thullner, M., Kampara, M., Richnow, H.H., Harms, H. and Wick, L.Y.  2008.  Impact of bioavailability restrictions on microbially induced stable isotope fractionation. 1. Theoretical calculation. Environmental Science & Technology 42(17), 6544-6551.
+- Thullner, M., Van Cappellen, P. and Regnier, P.  2005.  Modeling the impact of microbial activity on redox dynamics in porous media. Geochimica Et Cosmochimica Acta 69(21), 5005-5019.
+- Ward, J.P.J., Hendry, K.R., Arndt, S., Faust, J.C., Freitas, F.S., Henley, S.F., Krause, J.W., März, C., Tessin, A.C. and Airs, R.L.  2022.  Benthic silicon cycling in the Arctic Barents Sea: a reaction–transport model study. Biogeosciences 19(14), 3445-3467.
+- Wehrmann, L.M., Arndt, S., März, C., Ferdelman, T.G. and Brunner, B.  2013.  The evolution of early diagenetic signals in Bering Sea subseafloor sediments in response to varying organic carbon deposition over the last 4.3Ma. Geochimica et Cosmochimica Acta 109, 175-196.
 
-- Regnier, P., Jourabchi, P., Slomp, C.P., 2003. Reactive-transport modeling as a technique for understanding coupled biogeochemical processes in surface and subsurface environments. *Netherlands Journal of Geosciences*, 82(1), 5–18. [[Link]](https://www.cambridge.org/core/services/aop-cambridge-core/content/view/B57F7ED4E1450FEFF9A651F6C3989A8B/S0016774600022757a.pdf/reactivetransport_modeling_as_a_technique_for_understanding_coupled_biogeochemical_processes_in_surface_and_subsurface_environments.pdf)
+# BRNS coupled to other transport models: Description
+- Centler, F., Shao, H., De Biase, C., Park, C.-H., Regnier, P., Kolditz, O. and Thullner, M.  2010.  GeoSysBRNS-A flexible multidimensional reactive transport model for simulating biogeochemical subsurface processes. Computers & Geosciences 36(3), 397-405.
+- Gharasoo, M., Centler, F., Regnier, P., Harms, H. and Thullner, M.  2012.  A reactive transport modeling approach to simulate biogeochemical processes in pore structures with pore-scale heterogeneities. Environmental Modelling & Software 30, 102-114.
+- Golparvar, A., Kästner, M. and Thullner, M.  2024.  P3D-BRNS v1.0.0: a three-dimensional, multiphase, multicomponent, pore-scale reactive transport modelling package for simulating biogeochemical processes in subsurface environments. Geoscientific Model Development 17(2), 881-898.
+- Nick, H.M., Raoof, A., Centler, F., Thullner, M. and Regnier, P.  2013.  Reactive dispersive contaminant transport in coastal aquifers: numerical simulation of a reactive Henry problem. Journal of Contaminant Hydrology 145, 90-104.
+- Raoof, A., Nick, H.M., Hassanizadeh, S.M. and Spiers, C.J.  2013.  PoreFlow: A complex pore-network model for simulation of reactive transport in variably saturated porous media. Computers & Geosciences 61, 160-174.
 
-- Aguilera, D.R., Jourabchi, P., Spiteri, C. and Regnier, P., 2005. A knowledge-based reactive transport approach for the simulation of biogeochemical dynamics in Earth systems. *Geochemistry, Geophysics, Geosystems*, 6(7). [[Link]](https://www.vliz.be/imisdocs/publications/ocrd/229982.pdf)
-
-## Publications related to BRNS
-
-- Jourabchi, P., Van Cappellen, P. and Regnier, P., 2005. Quantitative interpretation of pH distributions in aquatic sediments: A reaction-transport modeling approach. *American Journal of Science*, 305(9), pp.919–956. [[Link]](https://ajsonline.org/article/61597-quantitative-interpretation-of-ph-distributions-in-aquatic-sediments-a-reaction-transport-modeling-approach)
-
-- Thullner, M., Van Cappellen, P. and Regnier, P., 2005. Modeling the impact of microbial activity on redox dynamics in porous media. *Geochimica et Cosmochimica Acta*. [[Link]](https://linkinghub.elsevier.com/retrieve/pii/S0016703705007106)
-
-- Spiteri, C., Slomp, C.P., Regnier, P., Meile, C., Van Cappellen, P., 2007. Modelling the geochemical fate and transport of wastewater-derived phosphorus in contrasting groundwater systems. *Journal of Contaminant Hydrology*, 92(1-2), 87–108.
-
-- Dale, A.W., Regnier, P., Knab, N.J., Jørgensen, B.B., Van Cappellen, P., 2008. Anaerobic oxidation of methane (AOM) in marine sediments from the Skagerrak (Denmark): II. Reaction-transport modeling. *Geochim. Cosmochim. Acta*, 72(12), 2880–2894. doi:10.1016/j.gca.2007.11.039.
-
-- Spiteri, C., Slomp, C., Tuncay, K., Meile, C., 2008. Modeling biogeochemical processes in subterranean estuaries: the effect of flow dynamics and redox conditions on submarine groundwater discharge. *Water Resources Research*, 44(2), 18pp.
-
-- Thullner, M., Kampara, M., Richnow, H.H., Harms, H., Wick, L.Y., 2008. Impact of bioavailability restrictions on microbially induced stable isotope fractionation 1. Theoretical calculation. *Environmental Science & Technology*, 42(17), 6544–6551.
-
-- Shao, H., 2009. Modelling reactive transport processes in porous media. Doctor rerum naturalium, Technische Universität Dresden. [[Link]](https://tud.qucosa.de/en/api/qucosa%3A25402/attachment/ATT-0/)
-
-- Thullner, M., Dale, A.W., Regnier, P., 2009. Global-scale quantification of mineralization pathways in marine sediments: A reaction-transport modeling approach. *Geochem. Geophys. Geosystems*, 10(10), 1–24. doi:10.1029/2009GC002484.
-
-- Centler, F., Shao, H., De Biase, C., Park, C.H., Regnier, P., Kolditz, O. and Thullner, M., 2010. GeoSysBRNS—A flexible multidimensional reactive transport model for simulating biogeochemical subsurface processes. *Computers & Geosciences*. [[Link]](https://linkinghub.elsevier.com/retrieve/pii/S0098300409002957)
-
-- Gharasoo, M., Centler, F., Regnier, P., Harms, H., Thullner, M., 2012. A reactive transport modeling approach to simulate biogeochemical processes in pore structures with pore-scale heterogeneities. *Environmental Modelling & Software*, 30, 102–114. [[Link]](https://www.researchgate.net/profile/Mehdi_Gharasoo/publication/233733435_A_reactive_transport_modeling_approach_to_simulate_biogeochemical_processes_in_pore_structures_with_pore-scale_heterogeneities/links/5cceee9192851c4eab84debf/A-reactive-transport-modeling-approach-to-simulate-biogeochemical-processes-in-pore-structures-with-pore-scale-heterogeneities.pdf)
-
-- Nick, H.M., Raoof, A., Centler, F., Thullner, M., Regnier, P., 2013. Reactive dispersive contaminant transport in coastal aquifers: numerical simulation of a reactive Henry problem. *Journal of Contaminant Hydrology*, 145, 90–104.
-
-- Wehrmann, L.M., Arndt, S., März, C., Ferdelman, T.G., Brunner, B., 2013. The evolution of early diagenetic signals in Bering Sea subseafloor sediments in response to varying organic carbon deposition over the last 4.3 Ma. *Geochim. Cosmochim. Acta*, 109, 175–196. doi:10.1016/j.gca.2013.01.025.
-
-- Gholami Gharasoo, M., 2014. Reactive transport simulations of microbial activity and biogeochemical transformations in porous environments - development and application of a pore-network model. Doctor of Philosophy, Utrecht University. [[Link]](https://dspace.library.uu.nl/handle/1874/298612)
-
-- Freitas, F.S. et al., 2020. New insights into large-scale trends of apparent organic matter reactivity in marine sediments and patterns of benthic carbon transformation. *Biogeosciences*, Supplement. [[Link]](https://orca.cardiff.ac.uk/id/eprint/143073/1/Freitas_et_al_BG_2020_435_ESM.pdf)
-
-- Blouet, J.P., Arndt, S., Imbert, P. and Regnier, P., 2021. Are seep carbonates quantitative proxies of CH4 leakage? Modeling the influence of sulfate reduction and anaerobic oxidation of methane on pH and CaCO3 saturation. *Chemical Geology*. [[Link]](https://linkinghub.elsevier.com/retrieve/pii/S0009254121001984)
-
-- Ward, S.L., Hendry, K.R., Arndt, S. et al., 2022. Modelling the benthic silicon cycle in the Barents Sea. *Biogeosciences*, Supplement. [[Link]](https://bg.copernicus.org/preprints/bg-2022-51/bg-2022-51-supplement.pdf)
-
-- Golparvar, A., Kästner, K. and Thullner, M., 2024. P3D-BRNS v1.0.0: A three-dimensional, multiphase, multicomponent, pore-scale reactive transport modelling package for simulating biogeochemical processes in subsurface environments. *Geoscientific Model Development*, 17, pp.881–902. [[Link]](https://gmd.copernicus.org/articles/17/881/2024/)
-
-- Khurana, S., Heße, F., Hildebrandt, A., Thullner, M., 2024. Microbial mediated carbon and nitrogen cycling in the spatially heterogeneous vadose zone: A modeling study. *Vadose Zone Journal*, 23(2), e20315. [[Link]](https://acsess.onlinelibrary.wiley.com/doi/pdfdirect/10.1002/vzj2.20315)
+# BRNS coupled to other transport models: Applications
+- Centler, F., Hesse, F. and Thullner, M.  2013.  Estimating pathway-specific contributions to biodegradation in aquifers based on dual isotope analysis: Theoretical analysis and reactive transport simulations. Journal of Contaminant Hydrology 152C, 97-116.
+- Gharasoo, M., Centler, F., Fetzer, I. and Thullner, M.  2014.  How the chemotactic characteristics of bacteria can determine their population patterns. Soil Biology & Biochemistry 69, 346-358.
+- Khurana, S., Heße, F., Hildebrandt, A. and Thullner, M.  2022a.  Predicting the impact of spatial heterogeneity on microbially mediated nutrient cycling in the subsurface. Biogeosciences 19(3), 665-688.
+- Khurana, S., Heße, F., Hildebrandt, A. and Thullner, M.  2022b.  Should We Worry About Surficial Dynamics When Assessing Nutrient Cycling in the Groundwater? Frontiers in Water 4.
+- Khurana, S., Heße, F., Hildebrandt, A. and Thullner, M.  2024.  Microbial mediated carbon and nitrogen cycling in the spatially heterogeneous vadose zone: A modeling study. Vadose Zone Journal 23(2).
+- Stolpovsky, K., Gharasoo, M. and Thullner, M.  2012.  The Impact of Pore-Size Heterogeneities on the Spatiotemporal Variation of Microbial Metabolic Activity in Porous Media. Soil Science 177(2), 98-110.
+- Thullner, M., Centler, F., Richnow, H.-H. and Fischer, A.  2012.  Quantification of organic pollutant degradation in contaminated aquifers using compound specific stable isotope analysis - Review of recent developments. Organic Geochemistry 42(12), 1440-1460.

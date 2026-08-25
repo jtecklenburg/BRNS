@@ -19,7 +19,8 @@ markdown_extensions:
     - pymdownx.superfences
 
 nav:
-    - "Start": index.md
+    - "Start": README.md
+    - "YAML Model Reference": yaml_model_reference.md
     - "Literature": references.md
     - "acg": api_acg.md
     - "gaussian_elimination": api_gaussian_elimination.md
