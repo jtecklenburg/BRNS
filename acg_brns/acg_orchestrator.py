@@ -982,9 +982,8 @@ class ACGOrchestrator:
         stoich_matrix = self.mapper.build_stoichiometry_matrix(self.evaluator)
         reactions = self.mapper.build_rate_expressions()
 
-        dissolved = [s for s in self.mapper.species_list if s.get('type') == 'dissolved']
-        solid = [s for s in self.mapper.species_list if s.get('type') == 'solid']
         ordered_reaction_ids = [reaction['id'] for reaction in self.mapper._get_ordered_reactions()]
+        structure_counts = self.mapper.build_structure_counts()
 
         self.acg_data = {
             'bio_name': bio_name,
@@ -994,10 +993,11 @@ class ACGOrchestrator:
             'stoich_matrix': stoich_matrix,
             'reactions': reactions,
             'reaction_ids': ordered_reaction_ids,
-            'ndissolved': len(dissolved),
-            'nsolids': len(solid),
+            'ndissolved': structure_counts['ndissolved'],
+            'nsolids': structure_counts['nsolids'],
+            'neqrxns': structure_counts['neqrxns'],
             'ncompo': len(variables),
-            'nreactions': len(reactions)
+            'nreactions': structure_counts['nreactions']
         }
 
         if self.verbose:

@@ -191,6 +191,28 @@ class YAMLtoACGMapper:
             Dictionary mapping species name to 1-indexed Fortran array index
         """
         return self.species_map.copy()
+
+    def build_structure_counts(self) -> Dict[str, int]:
+        """
+        Derive model dimensions from actual YAML data instead of storing them
+        redundantly in a `structure` block.
+
+        Returns:
+            Dictionary with derived counts:
+            - nsolids: number of species with type == "solid"
+            - ndissolved: number of species with type == "dissolved"
+            - nreactions: total number of reactions
+            - neqrxns: number of equilibrium reactions
+        """
+        species = self.species_list
+        reactions = self.config.get('reactions', [])
+
+        return {
+            'nsolids': sum(1 for s in species if s.get('type') == 'solid'),
+            'ndissolved': sum(1 for s in species if s.get('type') == 'dissolved'),
+            'nreactions': len(reactions),
+            'neqrxns': sum(1 for r in reactions if r.get('equilibrium') is True)
+        }
     
     def get_solid_indices(self) -> List[int]:
         """

@@ -25,12 +25,6 @@ output:
     start: 12.
     interval: 12.
 
-structure:
-  nsolids: 31
-  ndissolved: 10
-  nreactions: 41
-  neqrxns: 0
-
 initial_conditions:
   mode: 2
 

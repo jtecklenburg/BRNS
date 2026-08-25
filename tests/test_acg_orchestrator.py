@@ -454,6 +454,24 @@ class TestIntegrationCanfield(unittest.TestCase):
         """Clean up."""
         shutil.rmtree(self.temp_dir, ignore_errors=True)
     
+    def test_structure_counts_are_derived_from_model_data(self):
+        """Counts must be derived from species and reactions, not stored in YAML."""
+        orchestrator = ACGOrchestrator(
+            self.yaml_path,
+            str(self.output_dir),
+            verbose=False
+        )
+
+        orchestrator.load_config()
+        orchestrator.evaluate_formulas()
+        acg_data = orchestrator.map_to_acg_structures()
+
+        self.assertNotIn('structure', orchestrator.config)
+        self.assertEqual(acg_data['nsolids'], 6)
+        self.assertEqual(acg_data['ndissolved'], 12)
+        self.assertEqual(acg_data['nreactions'], 19)
+        self.assertEqual(acg_data['neqrxns'], 3)
+
     def test_complete_pipeline_phases_1_to_4(self):
         """Test complete pipeline through phase 4 (pre-processing)."""
         orchestrator = ACGOrchestrator(
@@ -473,6 +491,7 @@ class TestIntegrationCanfield(unittest.TestCase):
         self.assertEqual(orchestrator.acg_data['ndissolved'], 12)
         self.assertEqual(orchestrator.acg_data['nsolids'], 6)
         self.assertEqual(orchestrator.acg_data['nreactions'], 19)
+        self.assertEqual(orchestrator.acg_data['neqrxns'], 3)
         
         # Verify reduced system
         self.assertIsNotNone(orchestrator.reduced_system)
