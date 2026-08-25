@@ -156,7 +156,9 @@ reactions:
 
 ### 2. Run the code generator
 
-#### Option A: script based usage to build and run a single YAML model
+#### Option A: script based usage to build and run a single YAML model (Linux only)
+
+Requirements: Python with BRNS, gfortran.
 
 ```bash
 ./build_python.sh -c ./models/single_species_example.yaml -i ./path/to/input_files
@@ -187,23 +189,15 @@ orchestrator = ACGOrchestrator(
 
 summary = orchestrator.generate()
 print(summary)
-
-### 3. Compile the generated simulator
-
-```bash
-# TODO: add compilation instructions (Makefile / build script)
 ```
 
-### 4. Run BRNS
-
-- As a **stand-alone console program**:
-  ```bash
-  # TODO: add example run command
-  ```
-- As a **library**, linked into a transport code:
-  ```text
-  # TODO: add linking / API instructions
-  ```
+Next compile and run BRNS:
+1. Create a build directory.
+2. Copy static Fortran Files from folder BRNSPackage/FortranFiles into your build directory.
+3. Copy the Python generated Fortran Files into your build directory.
+4. Compile the Fortran Files in the build directory with your favorite Fortran compiler as stand-alone .console program (or as a library).
+5. Add files with initial conditions into the folder with the executable (optional) and run executable.
+6. Evaluate results with notebooks/plot_results.ipynb.
 
 ---
 
@@ -217,21 +211,16 @@ The documentation can be found under `docs/` or [online](https://jtecklenburg.gi
 
 The original BRNS concept and code base were introduced and developed in the following foundational publications:
 
-- Regnier, P., O'Kane, J.P., Steefel, C.I. and Vanderborght, J.P., 2002. Modeling complex multi-component reactive-transport systems: towards a simulation environment based on the concept of a Knowledge Base. *Applied Mathematical Modelling*.
+- Aguilera, D.R., Jourabchi, P., Spiteri, C. and Regnier, P.  2005.  A knowledge-based reactive transport approach for the simulation of biogeochemical dynamics in Earth systems. Geochemistry Geophysics Geosystems 6(7), Q07012.
+- Regnier, P., O'Kane, J.P., Steefel, C.I. and Vanderborght, P.  2002.  Modeling complex multi-component reactive-transport systems: towards a simulation environment based on the concept of a Knowledge Base. Applied Mathematical Modelling 26(9), 913-927.
 
-- Aguilera, D.R., Jourabchi, P., Spiteri, C. and Regnier, P., 2005. A knowledge-based reactive transport approach for the simulation of biogeochemical dynamics in Earth systems. *Geochemistry, Geophysics, Geosystems*, 6(7).
-
-A more complete, continuously updated bibliography of BRNS-based studies can be found in the project documentation.
+A comprehensive bibliography of BRNS-based studies can be found in the [project documentation](https://jtecklenburg.github.io/BRNS/).
 
 ---
 
 ## Contributing
 
 When you like to contribute to this project, please contact Martin.Thullner@bgr.de.
-
-## License
-
-MIT License. See [LICENSE](LICENSE).
 
 ## Acknowledgments
 
@@ -243,3 +232,7 @@ This project builds upon the work and concepts of several contributors:
 - Jan Tecklenburg: Python version implementation.
 
 The Python based version of BRNS was funded by ptj, Förderprogramm: Geoforschung und Nachhaltigkeit (GEO:N), Förderkennzeichen: 03G0937B (BMFTR)
+
+## License
+
+MIT License. See [LICENSE](LICENSE).
