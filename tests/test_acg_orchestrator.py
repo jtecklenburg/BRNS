@@ -206,6 +206,49 @@ class TestConfigLoading(unittest.TestCase):
         
         with self.assertRaises(ACGOrchestrationError):
             orchestrator.load_config()
+
+    def test_species_transport_defaults_to_true(self):
+        """species.transport is optional and defaults to True."""
+        yaml_path = Path(self.temp_dir) / 'species_transport_default.yaml'
+        config = {
+            'species': [
+                {'name': 'o2', 'type': 'dissolved'},
+                {'name': 'ch2o', 'type': 'solid'}
+            ],
+            'reactions': [{'id': 1, 'name': 'test', 'stoichiometry': {'o2': -1}}],
+            'parameters': {'biogeochemical': []}
+        }
+        with open(yaml_path, 'w') as f:
+            yaml.dump(config, f)
+
+        orchestrator = ACGOrchestrator(str(yaml_path), str(self.output_dir))
+        orchestrator.load_config()
+        orchestrator.evaluate_formulas()
+        orchestrator.map_to_acg_structures()
+
+        self.assertEqual(orchestrator._build_no_transport_list(), [])
+
+    def test_build_no_transport_list_from_species_transport(self):
+        """No-transport list should be derived from species.transport flags."""
+        yaml_path = Path(self.temp_dir) / 'species_transport_list.yaml'
+        config = {
+            'species': [
+                {'name': 'o2', 'type': 'dissolved', 'transport': True},
+                {'name': 'ch2o', 'type': 'solid', 'transport': False},
+                {'name': 'fe2', 'type': 'dissolved', 'transport': False},
+            ],
+            'reactions': [{'id': 1, 'name': 'test', 'stoichiometry': {'o2': -1}}],
+            'parameters': {'biogeochemical': []}
+        }
+        with open(yaml_path, 'w') as f:
+            yaml.dump(config, f)
+
+        orchestrator = ACGOrchestrator(str(yaml_path), str(self.output_dir))
+        orchestrator.load_config()
+        orchestrator.evaluate_formulas()
+        orchestrator.map_to_acg_structures()
+
+        self.assertEqual(orchestrator._build_no_transport_list(), [2, 3])
     
     def test_invalid_species_format(self):
         """Test validation fails for invalid species format."""

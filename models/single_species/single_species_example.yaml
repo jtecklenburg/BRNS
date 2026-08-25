@@ -37,6 +37,7 @@ initial_conditions:
 species:
   - name: "diss_a"
     type: "dissolved"
+    transport: true
     description: "Single dissolved species"
     output: true
     output_filename: "diss_a"
@@ -105,8 +106,6 @@ advanced:
     ttol: 5.d-2
     tstep: 1.0d0
     maxconc: 0.d0
-
-  listnotransp: []
 
 notes:
   - "Converted from the Maple single-species example"

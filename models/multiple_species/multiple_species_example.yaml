@@ -37,6 +37,7 @@ initial_conditions:
 species:
   - name: "diss_a"
     type: "dissolved"
+    transport: true
     description: "Species A"
     output: true
     output_filename: "diss_a"
@@ -51,6 +52,7 @@ species:
 
   - name: "diss_b"
     type: "dissolved"
+    transport: true
     description: "Species B"
     output: true
     output_filename: "diss_b"
@@ -65,6 +67,7 @@ species:
 
   - name: "diss_c"
     type: "dissolved"
+    transport: true
     description: "Species C"
     output: true
     output_filename: "diss_c"
@@ -79,6 +82,7 @@ species:
 
   - name: "diss_d"
     type: "dissolved"
+    transport: true
     description: "Species D"
     output: true
     output_filename: "diss_d"
@@ -93,6 +97,7 @@ species:
 
   - name: "diss_e"
     type: "dissolved"
+    transport: true
     description: "Species E"
     output: true
     output_filename: "diss_e"
@@ -183,8 +188,6 @@ advanced:
 
   optimization:
     enabled: false
-
-  listnotransp: []
 
   timestep_parameters:
     dtold: 1.d-6

@@ -37,6 +37,7 @@ initial_conditions:
 species:
   - name: "t_stamp"
     type: "solid"
+    transport: false
     description: "Species 1"
     output: true
     output_filename: "t_stamp"
@@ -79,6 +80,7 @@ species:
 
   - name: "tol_h_l_LC"
     type: "solid"
+    transport: false
     description: "Species 4"
     output: true
     output_filename: "tol_h_l_LC"
@@ -93,6 +95,7 @@ species:
 
   - name: "tol_d_l_LC"
     type: "solid"
+    transport: false
     description: "Species 5"
     output: true
     output_filename: "tol_d_l_LC"
@@ -107,6 +110,7 @@ species:
 
   - name: "tol_h_res_LC"
     type: "solid"
+    transport: false
     description: "Species 6"
     output: true
     output_filename: "tol_h_res_LC"
@@ -121,6 +125,7 @@ species:
 
   - name: "tol_d_res_LC"
     type: "solid"
+    transport: false
     description: "Species 7"
     output: true
     output_filename: "tol_d_res_LC"
@@ -135,6 +140,7 @@ species:
 
   - name: "tol_h_head_LC"
     type: "solid"
+    transport: false
     description: "Species 8"
     output: true
     output_filename: "tol_h_head_LC"
@@ -149,6 +155,7 @@ species:
 
   - name: "tol_d_head_LC"
     type: "solid"
+    transport: false
     description: "Species 9"
     output: true
     output_filename: "tol_d_head_LC"
@@ -191,6 +198,7 @@ species:
 
   - name: "tol_h_l_HC"
     type: "solid"
+    transport: false
     description: "Species 12"
     output: true
     output_filename: "tol_h_l_HC"
@@ -205,6 +213,7 @@ species:
 
   - name: "tol_d_l_HC"
     type: "solid"
+    transport: false
     description: "Species 13"
     output: true
     output_filename: "tol_d_l_HC"
@@ -219,6 +228,7 @@ species:
 
   - name: "tol_h_res_HC"
     type: "solid"
+    transport: false
     description: "Species 14"
     output: true
     output_filename: "tol_h_res_HC"
@@ -233,6 +243,7 @@ species:
 
   - name: "tol_d_res_HC"
     type: "solid"
+    transport: false
     description: "Species 15"
     output: true
     output_filename: "tol_d_res_HC"
@@ -247,6 +258,7 @@ species:
 
   - name: "tol_h_head_HC"
     type: "solid"
+    transport: false
     description: "Species 16"
     output: true
     output_filename: "tol_h_head_HC"
@@ -261,6 +273,7 @@ species:
 
   - name: "tol_d_head_HC"
     type: "solid"
+    transport: false
     description: "Species 17"
     output: true
     output_filename: "tol_d_head_HC"
@@ -303,6 +316,7 @@ species:
 
   - name: "tol_h_l_B1"
     type: "solid"
+    transport: false
     description: "Species 20"
     output: true
     output_filename: "tol_h_l_B1"
@@ -317,6 +331,7 @@ species:
 
   - name: "tol_d_l_B1"
     type: "solid"
+    transport: false
     description: "Species 21"
     output: true
     output_filename: "tol_d_l_B1"
@@ -331,6 +346,7 @@ species:
 
   - name: "tol_h_res_B1"
     type: "solid"
+    transport: false
     description: "Species 22"
     output: true
     output_filename: "tol_h_res_B1"
@@ -345,6 +361,7 @@ species:
 
   - name: "tol_d_res_B1"
     type: "solid"
+    transport: false
     description: "Species 23"
     output: true
     output_filename: "tol_d_res_B1"
@@ -359,6 +376,7 @@ species:
 
   - name: "tol_h_head_B1"
     type: "solid"
+    transport: false
     description: "Species 24"
     output: true
     output_filename: "tol_h_head_B1"
@@ -373,6 +391,7 @@ species:
 
   - name: "tol_d_head_B1"
     type: "solid"
+    transport: false
     description: "Species 25"
     output: true
     output_filename: "tol_d_head_B1"
@@ -415,6 +434,7 @@ species:
 
   - name: "tol_h_l_B2"
     type: "solid"
+    transport: false
     description: "Species 28"
     output: true
     output_filename: "tol_h_l_B2"
@@ -429,6 +449,7 @@ species:
 
   - name: "tol_d_l_B2"
     type: "solid"
+    transport: false
     description: "Species 29"
     output: true
     output_filename: "tol_d_l_B2"
@@ -443,6 +464,7 @@ species:
 
   - name: "tol_h_res_B2"
     type: "solid"
+    transport: false
     description: "Species 30"
     output: true
     output_filename: "tol_h_res_B2"
@@ -457,6 +479,7 @@ species:
 
   - name: "tol_d_res_B2"
     type: "solid"
+    transport: false
     description: "Species 31"
     output: true
     output_filename: "tol_d_res_B2"
@@ -471,6 +494,7 @@ species:
 
   - name: "tol_h_head_B2"
     type: "solid"
+    transport: false
     description: "Species 32"
     output: true
     output_filename: "tol_h_head_B2"
@@ -485,6 +509,7 @@ species:
 
   - name: "tol_d_head_B2"
     type: "solid"
+    transport: false
     description: "Species 33"
     output: true
     output_filename: "tol_d_head_B2"
@@ -527,6 +552,7 @@ species:
 
   - name: "tol_h_l_B3"
     type: "solid"
+    transport: false
     description: "Species 36"
     output: true
     output_filename: "tol_h_l_B3"
@@ -541,6 +567,7 @@ species:
 
   - name: "tol_d_l_B3"
     type: "solid"
+    transport: false
     description: "Species 37"
     output: true
     output_filename: "tol_d_l_B3"
@@ -555,6 +582,7 @@ species:
 
   - name: "tol_h_res_B3"
     type: "solid"
+    transport: false
     description: "Species 38"
     output: true
     output_filename: "tol_h_res_B3"
@@ -569,6 +597,7 @@ species:
 
   - name: "tol_d_res_B3"
     type: "solid"
+    transport: false
     description: "Species 39"
     output: true
     output_filename: "tol_d_res_B3"
@@ -583,6 +612,7 @@ species:
 
   - name: "tol_h_head_B3"
     type: "solid"
+    transport: false
     description: "Species 40"
     output: true
     output_filename: "tol_h_head_B3"
@@ -597,6 +627,7 @@ species:
 
   - name: "tol_d_head_B3"
     type: "solid"
+    transport: false
     description: "Species 41"
     output: true
     output_filename: "tol_d_head_B3"
@@ -1168,8 +1199,6 @@ advanced:
       condition: "x(j) < 30.0"
     - name: "sw2"
       condition: "x(j) < 1.0e-2"
-
-  listnotransp: [1, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 25, 28, 29, 30, 31, 32, 33, 36, 37, 38, 39, 40, 41]
 
 notes:
   - "Converted from Column_volatile_compounds-full-all_columns markdown source"

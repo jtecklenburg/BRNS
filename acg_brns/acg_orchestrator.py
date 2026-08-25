@@ -306,6 +306,12 @@ class ACGOrchestrator:
                         f"Unknown species type '{sp['type']}'.",
                         f"Allowed values: {sorted(allowed_types)}."
                     ))
+                if 'transport' in sp and not isinstance(sp['transport'], bool):
+                    issues.append(ValidationIssue(
+                        'ERROR', f"{path}.transport",
+                        "'transport' must be a boolean.",
+                        "Example: transport: true or transport: false"
+                    ))
                 # S-8: scalar/formula fields must not be list or dict
                 _scalar_fields = (
                     'bc_upper_value', 'bc_lower_value', 'init_value',
@@ -1589,51 +1595,39 @@ class ACGOrchestrator:
 
         return net_rates
     
-    def _build_no_transport_list(self) -> List[str]:
+    def _build_no_transport_list(self) -> List[int]:
         """
-        Build list of species without transport.
+        Build list of species without transport from per-species transport flags.
 
-        Maple-compatible behavior:
-        - Uses explicit `listnotransp` only
-        - Does NOT implicitly add all solids or D0==0 species
-          (those are handled via `issolid.f` / diffusion settings)
-        
-        Returns:
-            List of species indices or names for acg14()
+        Logic:
+        - species.transport defaults to True
+        - species.transport=False marks a species as non-transported
+        - the returned list contains 1-based Fortran species indices for acg14()
         """
-        # Preferred location: advanced.listnotransp (Maple naming retained)
-        # Optional fallback: transport.listnotransp
-        advanced_cfg = self._get_mapping_section('advanced', {})
-        raw_list = advanced_cfg.get('listnotransp', None)
-        if raw_list is None:
-            transport_cfg = self._get_mapping_section('transport', {})
-            raw_list = transport_cfg.get('listnotransp', [])
-
-        if not isinstance(raw_list, list):
+        species_cfg = self.config.get('species', []) if self.config else []
+        if not isinstance(species_cfg, list):
             return []
 
-        # Normalize entries to species names or integer indices accepted by acg14
-        species_map = self.acg_data.get('species_map', {})
-        normalized = []
-        for item in raw_list:
-            if isinstance(item, int):
-                normalized.append(item)
-            elif isinstance(item, str):
-                # Allow either species name ("ch2o") or numeric string ("7")
-                if item.isdigit():
-                    normalized.append(int(item))
-                elif item in species_map:
-                    normalized.append(item)
-
-        # De-duplicate while preserving order
-        deduped = []
+        species_map = self.acg_data.get('species_map', {}) if self.acg_data else {}
+        no_transport = []
         seen = set()
-        for item in normalized:
-            if item not in seen:
-                deduped.append(item)
-                seen.add(item)
 
-        return deduped
+        for species in species_cfg:
+            if not isinstance(species, dict):
+                continue
+
+            name = species.get('name')
+            if not isinstance(name, str) or name not in species_map:
+                continue
+
+            transport_flag = species.get('transport', True)
+            if transport_flag is False:
+                idx = int(species_map[name])
+                if idx not in seen:
+                    no_transport.append(idx)
+                    seen.add(idx)
+
+        return no_transport
     
     def _list_generated_files(self) -> List[str]:
         """
