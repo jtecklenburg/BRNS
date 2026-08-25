@@ -116,7 +116,7 @@ grid:
   type: 0
 
 initial_conditions:
-  mode: 3
+  mode: 2
 
 species:
   - name: a

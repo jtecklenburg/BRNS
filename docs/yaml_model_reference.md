@@ -25,7 +25,7 @@ metadata:
 # ======================================================================
 
 units:
-  L: m
+  L: cm
   M: g
   T: a
 ```
@@ -229,7 +229,7 @@ Default behavior:
 ### 2.4 `reactions`
 A reaction block is the core of the model.
 
-Example:
+Example (kinetic reaction):
 
 ```yaml
 reactions:
@@ -243,6 +243,27 @@ reactions:
       co2: "(x+y+2*z)/x * SD"
       hco3: "- (y+2*z)/x * SD"
 ```
+
+Example (equilibrium reaction):
+
+```yaml
+reactions:
+  - id: 13
+    name: "sulfide_dissociation"
+    description: "H2S <-> HS- + H+"
+    equilibrium: true
+    rate: "F13 - B13"
+    rate_components:
+      F13: "kfs * hplus * hs"
+      B13: "kbs * h2s"
+    equilibrium_constraint: "hplus * hs - keqs * h2s"
+    stoichiometry:
+      h2s: 1
+      hs: -1
+      hplus: -1
+```
+
+Note: In real BRNS models, equilibrium reactions may still carry a `rate` / `rate_components` form as a forward-backward expression, but the decisive algebraic condition is `equilibrium_constraint`. The generator interprets the reaction as an equilibrium constraint, not as a normal kinetic rate law.
 
 Typical fields and expected data types:
 
@@ -306,9 +327,9 @@ The ACG generator supports three explicit initialization modes, implemented in `
 
 | Mode | Meaning in generator | Effect on `species.init_value` |
 | --- | --- | --- |
-| `1` | Read initial profiles from `initialconc.txt` | `species.init_value` is not used for the actual ACG initialization path; the solver reads the file. |
-| `2` | Constant initial conditions everywhere in the domain | `species.init_value` values are collected into the `iniconc` array and written to all nodes with `sp(i,j) = spi(i)`. |
-| `3` | Profile-based / file-driven initial conditions | The generator reads one profile file per selected species via `listinput` and `file_in_names`; `species.init_value` is not the active driver in this mode. |
+| `1` | Read initial profiles from `initialconc.txt` | `species.init_value` is not used.  |
+| `2` | Constant initial conditions everywhere in the domain | Reads `species.init_value`. |
+| `3` | Read initial conditions from files | The generator reads one profile file per species with file name species.name with ending `.inp`; example "co2.inp" ; `species.init_value` is not used. |
 
 Typical fields and expected data types:
 
