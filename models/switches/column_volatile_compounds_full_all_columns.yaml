@@ -1154,10 +1154,6 @@ advanced:
     gaussian_elimination: true
     symbolic_simplification: true
 
-  equilibrium:
-    enabled: false
-    reactions: []
-
   optimization:
     enabled: false
 

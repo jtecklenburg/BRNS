@@ -534,6 +534,29 @@ class TestRateExpressionBuilding(unittest.TestCase):
         self.assertIn('sp(3,j)', rxn['equilibrium_constraint'])  # hco3
         self.assertIn('sp(2,j)', rxn['equilibrium_constraint'])  # co2
 
+    def test_equilibrium_reaction_without_constraint_raises(self):
+        """Equilibrium reactions must declare an equilibrium constraint."""
+        config = {
+            'species': [
+                {'name': 'o2', 'type': 'dissolved'},
+                {'name': 'co2', 'type': 'dissolved'},
+            ],
+            'reactions': [
+                {
+                    'id': 1,
+                    'name': 'bad_equilibrium',
+                    'equilibrium': True,
+                    'rate': '0',
+                    'stoichiometry': {'o2': -1, 'co2': 1},
+                }
+            ]
+        }
+
+        mapper = YAMLtoACGMapper(config, {})
+
+        with self.assertRaisesRegex(ValueError, "equilibrium_constraint"):
+            mapper.build_rate_expressions()
+
     def test_reactions_are_sorted_by_id(self):
         """Reaction order should follow Maple IDs, not YAML declaration order."""
         unsorted_config = {

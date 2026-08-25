@@ -456,6 +456,11 @@ class YAMLtoACGMapper:
             if reaction.get('equilibrium', False):
                 rxn_data['equilibrium'] = True
                 constraint = reaction.get('equilibrium_constraint', '')
+                if not isinstance(constraint, str) or not constraint.strip():
+                    raise ValueError(
+                        f"Reaction {reaction_id}: 'equilibrium: true' requires a non-empty "
+                        "'equilibrium_constraint'."
+                    )
                 constraint_fortran = self.substitute_species_in_expression(constraint)
                 rxn_data['equilibrium_constraint'] = constraint_fortran
             else:

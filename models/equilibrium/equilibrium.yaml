@@ -824,11 +824,6 @@ advanced:
     gaussian_elimination: true
     symbolic_simplification: true
 
-  equilibrium:
-    enabled: true
-    reactions: [3, 4, 13]
-    solver: "algebraic"
-
   optimization:
     enabled: false
 
