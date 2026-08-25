@@ -105,12 +105,6 @@ units:
   M: arbitrary
   T: a
 
-structure:
-  nsolids: 0
-  ndissolved: 2
-  nreactions: 1
-  neqrxns: 0
-
 grid:
   nnodes: 51
   type: 0
