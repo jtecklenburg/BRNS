@@ -1,12 +1,16 @@
 """
-ACG Orchestrator - Complete YAML to Fortran Pipeline
+ACG orchestration pipeline from YAML to generated Fortran code.
 
-Orchestrates the full workflow from YAML configuration to generated Fortran code:
-1. Load and validate YAML configuration
-2. Evaluate formulas (FormulaEvaluator)
-3. Map to ACG structures (YAMLtoACGMapper)
-4. Pre-process stoichiometry (p0-p10 from gaussian_elimination)
-5. Generate Fortran code (acg0-acg17b from acg)
+This module coordinates the full BRNS code-generation workflow:
+1. Load and validate the YAML model definition.
+2. Evaluate formulas and parameter dependencies.
+3. Map YAML content to ACG-compatible data structures.
+4. Run the stoichiometric preprocessing steps (`p0` to `p10`) from
+   `gaussian_elimination`.
+5. Generate the final Fortran files via the ACG code generator.
+
+The orchestrator is the main entry point for turning a declarative reaction
+network into executable BRNS source code.
 
 Author: Jan Tecklenburg
 Date: 2026-03-03

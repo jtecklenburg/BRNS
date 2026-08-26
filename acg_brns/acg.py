@@ -1,38 +1,37 @@
 """
-ACG Module - Automatic Code Generation for BRNS
-Python equivalent to acg_optjoined_inpOK.mws
+Automatic code generation for BRNS.
 
-Ported from Maple to Python with **Maple-compatible function names**:
-- macrofor: Fortran code generation
-- SymPy: Symbolic mathematics
+This module contains the Python implementation of the Maple ACG routines used to
+emit problem-specific Fortran source files for BRNS simulations. It mirrors the
+Maple naming scheme and keeps the generated code aligned with the legacy BRNS
+workflow.
 
-Function List (Maple-Compatible Names):
-    acg0(...)   - Global geometry and parameters (common_geo.inc)
-    acg1(...)   - Boundary conditions (boundaries.f)
-    acg2(...)   - Molecular diffusion (molecular.f)
-    acg3(...)   - Biogeochemical parameters (biogeo.f)
-    acg4(...)   - Residual vector (residual.f)
-    acg5(...)   - Jacobian matrix (jacobian.f)
-    acg7(...)   - Output (output.f)
-    acg8(...)   - Physical parameters (basic.f)
-    acg12(...)  - Initial conditions (initialcond.f)
-    acg13(...)  - Steady-state rates (ssrates.f)
-    acg14(...)  - Non-transported species (notransport.f)
-    acg15(...)  - Reaction rates (rates.f)
-    acg16(...)  - Solid identification (issolid.f)
-    acg17(...)  - Terminal electron acceptor cascade (switches.f - TEAC)
-    acg17a(...) - Spatial switches (switches.f)
-    acg17b(...) - Parameters array (parameters.f)
-    acg17c(...) - Variable porosity (varporosity.f)
-    acg18(...)  - Time step parameter init include (inittimestep.inc)
+Function list (Maple-compatible names):
+- `acg0(...)`: global geometry and parameters (`common_geo.inc`)
+- `acg1(...)`: boundary conditions (`boundaries.f`)
+- `acg2(...)`: molecular diffusion (`molecular.f`)
+- `acg3(...)`: biogeochemical parameters (`biogeo.f`)
+- `acg4(...)`: residual vector (`residual.f`)
+- `acg5(...)`: Jacobian matrix (`jacobian.f`)
+- `acg7(...)`: output (`output.f`)
+- `acg8(...)`: physical parameters (`basic.f`)
+- `acg12(...)`: initial conditions (`initialcond.f`)
+- `acg13(...)`: steady-state rates (`ssrates.f`)
+- `acg14(...)`: non-transported species (`notransport.f`)
+- `acg15(...)`: reaction rates (`rates.f`)
+- `acg16(...)`: solid identification (`issolid.f`)
+- `acg17(...)`: terminal electron acceptor cascade (`switches.f` - TEAC)
+- `acg17a(...)`: spatial switches (`switches.f`)
+- `acg17b(...)`: parameter array (`parameters.f`)
+- `acg17c(...)`: variable porosity (`varporosity.f`)
+- `acg18(...)`: time-step initialization include (`inittimestep.inc`)
 
-All function names now match Maple original (proc0903-M.md) for direct equivalence.
-For detailed documentation, see docstring of each method (marked with **Maple equivalent:**).
-
-Note: Function numbers skip (no acg6, acg9-acg11) to match Maple original.
-
-Author: Port based on Maple ACG module
-Date: 2026-03-04 (Refactored to Maple-compatible names)
+Notes:
+- All names follow the Maple original (see `proc0903-M.md`) for direct
+  equivalence.
+- The function numbering intentionally skips `acg6` and `acg9`-`acg11` to match
+  the Maple convention.
+- Detailed behavior is documented in the docstrings of the individual methods.
 """
 
 from pathlib import Path

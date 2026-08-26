@@ -29,8 +29,11 @@ extra_css:
 
 nav:
     - "Start": README.md
-    - "YAML Model Reference": yaml_model_reference.md
     - "Literature": references.md
+    - "Linux / WSL installation": linux_installation.md
+    - "Windows installation": windows_installation.md
+    - "YAML Model Reference": yaml_model_reference.md
+    - "Developer pipeline": developer_pipeline.md
     - "acg": api_acg.md
     - "gaussian_elimination": api_gaussian_elimination.md
     - "acg_orchestrator": api_acg_orchestrator.md

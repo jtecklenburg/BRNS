@@ -1,25 +1,28 @@
 """
-Gaussian Elimination Module for ACG
-Python equivalent to Maple ACG functions p4() through p10()
+Gaussian elimination utilities for the BRNS ACG pipeline.
 
-This module reduces reaction network equations to minimal form by:
-- Building the stoichiometric coefficient matrix (p4-p6)
-- Computing the net rate equations (p7)
-- Handling equilibrium reactions (p8)
-- Adding implicit time discretization (p9)
-- Computing the Jacobian matrix (p10)
+This module implements the Maple-style reaction reduction steps `p4()` through
+`p10()`. It reduces a YAML-defined reaction network into a minimal symbolic
+system that can be emitted as BRNS-compatible Fortran code.
 
-Mathematical Framework:
-1. p4(): Build augmented matrix [coefficients | identity] and perform Gaussian elimination
-2. p5(): Row reduction to get reduced row echelon form
-3. p6(): Extract stoichiometric matrices (rightM, matrixM)
-4. p7(): Build residual expression from stoichiometric matrix
-5. p8(): Handle equilibrium reactions and inert components
-6. p9(): Add implicit Euler time discretization terms
-7. p10(): Compute Jacobian matrix via symbolic differentiation
+Overview:
+- `p0`-`p3`: initialize old variables, reaction lists, equation names, and
+  reaction ordering
+- `p4`-`p6`: build and reduce the stoichiometric coefficient matrix
+- `p7`: assemble the residual equations from the reduced stoichiometric system
+- `p8`: handle equilibrium reactions and conservation constraints
+- `p9`: add implicit Euler time discretization
+- `p10`: compute the Jacobian matrix
 
-Author: Port from Maple ACG module
-Date: 2025-02-10
+Workflow:
+1. Build the coefficient matrix from the symbolic equations.
+2. Perform Gaussian elimination with pivoting.
+3. Extract reduced stoichiometric matrices (`rightM`, `matrixM`).
+4. Assemble the residual expressions.
+5. Apply equilibrium and conservation handling.
+6. Add time discretization and compute the Jacobian.
+
+This module is the numerical core of the YAML-to-Fortran pipeline.
 """
 
 from typing import List, Dict, Tuple, Set, Union, Any
