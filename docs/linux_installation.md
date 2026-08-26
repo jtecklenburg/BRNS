@@ -178,4 +178,4 @@ Then run again.
 
 ### Adjust the notebook to your result folder
 
-Open [notebooks/plot_results.ipynb](notebooks/plot_results.ipynb) and change the example path in the first code cell if needed. The notebook expects a result directory with `.dat` files and then plots them by depth or time snapshot.
+Open `notebooks/plot_results.ipynb` and change the example path in the first code cell if needed. The notebook expects a result directory with `.dat` files and then plots them by depth or time snapshot.
