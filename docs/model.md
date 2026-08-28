@@ -7,7 +7,7 @@ The Biogeochemical Reaction Network Simulator (BRNS) represents biogeochemical a
 The stand-alone solver represents one-dimensional, multi-component reactive transport along the depth coordinate $x$. For each transported component $k$, the transient code advances the effective concentration form
 
 $$
-\frac{\partial C_k}{\partial t} = -v_k\frac{\partial C_k}{\partial x} + \frac{\partial}{\partial x}\left(D_k\frac{\partial C_k}{\partial x}\right + R_k(\mathbf{C},x,t).
+\frac{\partial C_k}{\partial t} = -v_k\frac{\partial C_k}{\partial x} + \frac{\partial}{\partial x}\left(D_k\frac{\partial C_k}{\partial x}\right) + R_k(\mathbf{C},x,t).
 $$
 
 Here, $C_k$ is the component concentration, $v_k$ is its effective advective velocity, $D_k$ is its total dispersion coefficient, and $R_k$ is the net production rate defined by the generated reaction network. The model distinguishes dissolved and solid components. Dissolved components use $v_k=v_d=w+q/(\phi A)$; solid components use $v_k=v_s=w$. The transport step uses the spatially variable $v_k$ and $D_k$ specified at grid faces. Components marked as non-transported are excluded from the transport step.
