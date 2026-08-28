@@ -29,6 +29,7 @@ extra_css:
 
 nav:
     - "Start": README.md
+    - "Model description": model.md
     - "Literature": references.md
     - "Linux / WSL installation": linux_installation.md
     - "Windows installation": windows_installation.md
