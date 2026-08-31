@@ -8,7 +8,7 @@ BRNS (**Biogeochemical Reaction Network Simulator**) is a flexible modelling fra
 
 ## What is BRNS?
 
-BRNS was originally developed to simulate early diagenetic processes in marine sediments, where large numbers of biogeochemical reactions (organic matter degradation, redox cycling of iron, manganese and sulfur, nutrient cycling, pH buffering, etc.) need to be solved simultaneously with transport processes such as diffusion, advection, bioturbation and bioirrigation.
+BRNS was developed to simulate processes in systems, where large numbers of biogeochemical reactions (organic matter degradation, redox cycling of iron, manganese and sulfur, nutrient cycling, pH buffering, etc.) need to be solved simultaneously with transport processes such as diffusion, advection, bioturbation and bioirrigation.
 
 Rather than requiring users to write custom solver code for each reaction network, BRNS uses an **automatic code generator** to translate a user-defined reaction network into ready-to-compile simulation code. This makes BRNS a flexible tool for anyone who needs to couple a reaction network to a transport model, without becoming a numerical-methods specialist first.
 
@@ -16,14 +16,14 @@ Rather than requiring users to write custom solver code for each reaction networ
 
 Since its introduction, BRNS and its derivatives have been applied to a wide range of subsurface and sediment biogeochemistry problems, including:
 
-- Early diagenesis and redox cycling of carbon, nitrogen, iron, manganese and sulfur in marine sediments [Regnier et al., 2002; Thullner et al., 2005]
+- Early diagenesis and redox cycling of carbon, nitrogen, iron, manganese and sulfur in marine sediments and groundwater [Thullner et al., 2005]
 - pH dynamics and proton budgets in aquatic sediments [Jourabchi et al., 2005]
 - Anaerobic oxidation of methane (AOM) and sulfate-methane transition zones [Blouet et al., 2021]
 - Methane hydrate stability and benthic methane escape under permafrost thaw [Sivan et al., 2020]
 - Coupling with multidimensional flow and transport codes (e.g. OpenGeoSys, OpenFOAM) for groundwater and pore-scale reactive transport [Centler et al., 2010; Golparvar et al., 2024]
-- Redox transformations of trace metals and contaminants (e.g. uranium, arsenic) [e.g. sensitivity analysis of uranium reduction, 2025]
+- Stable isotope fractionation due to reactive and transport processes [Centler et al., 2013; Khan et al., 2018]
 
-A curated bibliography of BRNS-related publications and applications is being can be found in the project documentation (`docs/`). 
+A curated bibliography of BRNS-related publications and applications is being can be found in the project documentation (`docs/`).
 
 ---
 
@@ -39,7 +39,7 @@ BRNS follows a three-step workflow:
 
 3. **Compile the generated Fortran code.**
    Compiling the generated files produces a problem-specific simulator. You can use it in two ways:
-   - **Stand-alone console program** — run BRNS directly as a batch reaction-transport solver for 1D problems.
+   - **Stand-alone console program** — run BRNS directly as a reaction-transport solver for 1D problems.
    - **Compiled library** — link BRNS against an external transport code (e.g. a groundwater flow and transport model), so BRNS handles the reaction step while the host code handles transport.
 
 ### What's new in this version
@@ -82,7 +82,7 @@ pip install -e .
 
 ### 1. Define your reaction network
 
-Create a YAML file describing your species, reactions and transport processes. The following example describes the conversion of species $A$ into $B$ under constant advective flow and diffusion:
+Create a YAML file describing your species, reactions and transport processes. The following example describes the conversion of species $A$ into $B$ under constant advective flow (parameters.physical.w0) and diffusion (species.transport_D0):
 
 $$
 A \xrightarrow{k} B,
@@ -113,7 +113,7 @@ initial_conditions:
   mode: 2
 
 species:
-  - name: a
+  - name: species_a
     type: dissolved
     bc_upper_type: 0
     bc_upper_value: 1.0
@@ -122,7 +122,7 @@ species:
     init_value: 0.0
     transport_D0: 1.0e-9
 
-  - name: b
+  - name: species_b
     type: dissolved
     bc_upper_type: 0
     bc_upper_value: 0.0
@@ -145,7 +145,7 @@ parameters:
 reactions:
   - id: 1
     rate: "k*a"
-    stoichiometry: {a: -1, b: 1}
+    stoichiometry: {species_a: -1, species_b: 1}
 ```
 
 ### 2. Run the code generator
