@@ -176,12 +176,12 @@ Typical fields and expected data types:
 | --- | --- | --- |
 | `biogeochemical` | List of objects | Biogeochemical parameter definitions. Each item has `name` (String), `value` (Float or Integer), and optional `description` (String). |
 | `stoichiometry` | Mapping | Global stoichiometric constants such as `x`, `y`, `z`, `s_dens`; values are Float or Integer. |
-| `physical.al` | Float | Cross-sectional area or pore-system area term. |
+| `physical.al` | Float | Longitudinal Dispersivity or Cross-sectional area or pore-system area term. |
 | `physical.q0` | Float | Vertical advective velocity / seepage velocity. Typical unit: cm/year. `0` means no advection. |
 | `physical.w0` | Float | Bioturbation mixing depth or effective mixing velocity. |
 | `physical.Db0` | Float | Bioturbation diffusion coefficient. |
 | `physical.por0` | Float | Reference porosity. Typical value: `0.3`, i.e. 30% pore space. |
-| `physical.area0` | Float | Reference cross-sectional area of the system. Typical value: `1.0` cm². |
+| `physical.area0` | Float | Dispersion length or Reference cross-sectional area of the system. |
 | `physical.t_celsius` | Float | Ambient temperature used for temperature corrections. |
 | `physical.salin` | Float | Salinity used for salinity-dependent corrections.  |
 | `physical.delt` | Float | Time step size for integration.  |
