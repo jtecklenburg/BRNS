@@ -943,6 +943,23 @@ class TestValidationMessages(unittest.TestCase):
         cfg['reactions'].append({'id': 1, 'name': 'dup', 'stoichiometry': {'o2': 1}})
         self._assert_error_contains(cfg, "not unique")
 
+    def test_reaction_ids_may_be_non_contiguous(self):
+        """Unique IDs order reactions but do not define Fortran rate indices."""
+        cfg = self._minimal_config()
+        cfg['reactions'][0]['id'] = 20
+        cfg['reactions'].append({
+            'id': 10, 'name': 'earlier', 'output': True,
+            'stoichiometry': {'o2': 1},
+        })
+
+        orchestrator = self._load(cfg)
+        orchestrator.evaluate_formulas()
+        orchestrator.map_to_acg_structures()
+        params = orchestrator._extract_generation_parameters()
+
+        self.assertEqual(orchestrator.acg_data['reaction_ids'], [10, 20])
+        self.assertEqual(params['listroutput'], [1])
+
     def test_r3_unknown_species_in_stoichiometry(self):
         """R-3: unknown species name in stoichiometry → ERROR with species name."""
         cfg = self._minimal_config()

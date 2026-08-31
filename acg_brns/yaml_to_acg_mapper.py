@@ -509,7 +509,7 @@ class YAMLtoACGMapper:
             transport_params[name] = {
                 'D0': species.get('transport_D0', 0.0),
                 'alpha': species.get('transport_alpha', 0.0),
-                'tortuosity': species.get('transport_tortuosity', 0.0)
+                'tortuosity': species.get('transport_tortuosity', 1.0)
             }
         
         return transport_params

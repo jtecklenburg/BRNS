@@ -123,19 +123,21 @@ Typical fields and expected data types:
 | Field | Type | Meaning / default |
 | --- | --- | --- |
 | `name` | String | Name of the species |
-| `type` | String | Expected values such as `"dissolved"` or `"solid"` |
+| `type` | String | Either `"dissolved"` or `"solid"` |
 | `transport` | Boolean | Whether the species can be transported in the flow. Optional. Default: `true` |
 | `bc_upper_type` | Integer | Type of the upper boundary condition. Code values: `0 = Dirichlet`, `1 = Neumann`, `2 = flux` |
 | `bc_upper_value` | Float | Value of the upper boundary condition |
 | `bc_lower_type` | Integer | Type of the lower boundary condition. Code values: `0 = Dirichlet`, `1 = Neumann`, `2 = flux` |
 | `bc_lower_value` | Float | Value of the lower boundary condition |
 | `transport_D0` | Float | Diffusion coefficient |
-| `transport_alpha` | Float | Dispersivity |
-| `transport_tortuosity` | Float | Tortuosity |
-| `init_value` | Float | Initial value. This is only evaluated when `initial_conditions.mode = 3` |
+| `transport_alpha` | Float | Derivative of Diffusion coefficient by temperature. Default = 0 |
+| `transport_tortuosity` | Float | Tortuosity. Default = 1 |
+| `init_value` | Float | Initial value. This is only evaluated when `initial_conditions.mode = 2` |
 
 ### 2.2 `parameters`
 The `parameters` section contains model parameters. The mapper reads these entries and builds the ACG parameter lists.
+
+The `parameters` block may contain arbitrary first-level subsections. Each subsection can use either a mapping (parameter_name: value) or a list of objects with name and value fields. Common subsections are biogeochemical, physical, and physical_flags.
 
 Example:
 
@@ -145,12 +147,6 @@ parameters:
     - name: "kfox"
       value: 0.221
       description: "Organic matter degradation rate constant"
-
-  stoichiometry:
-    x: 200.0
-    y: 21.0
-    z: 0.0
-    s_dens: 2.5
 
   physical:
     al: 1.0e-5
@@ -180,24 +176,23 @@ Typical fields and expected data types:
 | --- | --- | --- |
 | `biogeochemical` | List of objects | Biogeochemical parameter definitions. Each item has `name` (String), `value` (Float or Integer), and optional `description` (String). |
 | `stoichiometry` | Mapping | Global stoichiometric constants such as `x`, `y`, `z`, `s_dens`; values are Float or Integer. |
-| `physical.al` | Float | Cross-sectional area or pore-system area term. Typical unit: cm². |
+| `physical.al` | Float | Cross-sectional area or pore-system area term. |
 | `physical.q0` | Float | Vertical advective velocity / seepage velocity. Typical unit: cm/year. `0` means no advection. |
-| `physical.w0` | Float | Bioturbation mixing depth or effective mixing velocity. Typical unit: cm/year. |
-| `physical.Db0` | Float | Bioturbation diffusion coefficient. Typical unit: cm²/year. |
+| `physical.w0` | Float | Bioturbation mixing depth or effective mixing velocity. |
+| `physical.Db0` | Float | Bioturbation diffusion coefficient. |
 | `physical.por0` | Float | Reference porosity. Typical value: `0.3`, i.e. 30% pore space. |
 | `physical.area0` | Float | Reference cross-sectional area of the system. Typical value: `1.0` cm². |
-| `physical.t_celsius` | Float | Ambient temperature used for temperature corrections. Typical unit: °C. |
-| `physical.salin` | Float | Salinity used for salinity-dependent corrections. Typical unit: PSU. |
-| `physical.delt` | Float | Time step size for integration. Typical unit: years. |
-| `physical.depthmax` | Float | Maximum simulated depth / vertical domain height. Typical unit: cm. |
-| `physical.endt` | Float | End of simulation time. Typical unit: years. |
+| `physical.t_celsius` | Float | Ambient temperature used for temperature corrections. |
+| `physical.salin` | Float | Salinity used for salinity-dependent corrections.  |
+| `physical.delt` | Float | Time step size for integration.  |
+| `physical.depthmax` | Float | Maximum simulated depth / vertical domain height.  |
+| `physical.endt` | Float | End of simulation time. |
 | `physical_flags.iq` | Integer | Advection switch. `0` = constant advection, `1` = spatially variable advection. Default: `0` if not set. |
 | `physical_flags.iw` | Integer | Bioturbation switch. `0` = constant mixing, `1` = spatially variable mixing. Default: `0` if not set. |
 | `physical_flags.iDb` | Integer | Bioturbation diffusion switch. `0` = constant diffusion, `1` = spatially variable diffusion profile. Default: `0` if not set. |
 | `physical_flags.ipor` | Integer | Porosity switch. `0` = constant porosity, `1` = spatially variable porosity. Default: `0` if not set. |
 | `physical_flags.igrid` | Integer | Grid-type switch. `0` = uniform grid, `1` = logarithmic / compressed grid. Default: `0` if not set. |
 | `physical_flags.iarea` | Integer | Cross-sectional area switch. `0` = constant area, `1` = spatially variable area. Default: `0` if not set. |
-| `physical_flags.ic` | Integer | Number of conserved components identified by Gaussian elimination. Usually computed automatically and not manually set. |
 
 Default behavior:
 - Unspecified `physical_flags` values are typically treated as `0` by the mapper or orchestrator.
@@ -269,7 +264,7 @@ Typical fields and expected data types:
 
 | Field | Type | Meaning / default |
 | --- | --- | --- |
-| `id` | Integer | Unique reaction identifier |
+| `id` | Integer | Unique reaction identifier and sort key. IDs do not need to be consecutive. |
 | `name` | String | Reaction name |
 | `rate` | String | Rate expression as a symbolic formula |
 | `rate_components` | Mapping | Optional helper expressions used by the reaction rate; values are Strings |
@@ -294,10 +289,8 @@ advanced:
     enabled: false
 
   timestep_parameters:
-    dtold: 1.d-6
-    ttol: 5.d-2
     tstep: 1.0d-5
-    maxconc: 0.d0
+
 ```
 
 Typical fields and expected data types:
@@ -346,8 +339,8 @@ Example:
 
 ```yaml
 output:
-  directory: "../generated_fortran/canfield"
-  prefix: "canfield"
+  directory: "../generated_fortran/multiple_species"
+  prefix: "multiple_species"
   timing:
     start: 1.0
     interval: 1.0

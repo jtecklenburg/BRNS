@@ -1448,12 +1448,13 @@ class ACGOrchestrator:
         params['listoutput'] = output_sp_indices
         params['file_names'] = output_file_names
 
-        # Reaction outputs: collect reactions with output: true, sorted by id (Maple order)
+        # Reaction outputs use one-based positions in canonical ID order.
+        # YAML IDs are stable identifiers, not Fortran rate-array indices.
         output_r_indices = []
         output_rfile_names = []
-        for rxn in sorted(self.config.get('reactions', []), key=lambda r: r['id']):
+        for rate_index, rxn in enumerate(self.mapper._get_ordered_reactions(), start=1):
             if rxn.get('output', False):
-                output_r_indices.append(rxn['id'])
+                output_r_indices.append(rate_index)
                 output_rfile_names.append(rxn.get('output_filename', f"rate{rxn['id']}"))
         params['nroutput'] = len(output_r_indices)
         params['listroutput'] = output_r_indices
