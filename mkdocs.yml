@@ -30,7 +30,8 @@ extra_css:
 
 nav:
     - "Start": README.md
-    - "Model description": model.md
+    - "Transport model": model.md
+    - "Reaction network example": reaction_term_rk_yaml.md
     - "Literature": references.md
     - "Linux / WSL installation": linux_installation.md
     - "Windows installation": windows_installation.md
