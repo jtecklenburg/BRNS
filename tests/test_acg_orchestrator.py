@@ -1068,6 +1068,16 @@ class TestValidationMessages(unittest.TestCase):
         cfg['parameters']['biogeochemical'].append({'name': 'kox', 'value': 0.2})
         self._assert_error_contains(cfg, "not unique")
 
+    def test_r7_parameter_name_conflicts_with_species_or_fortran_keywords(self):
+        """R-7: parameter names must not override model symbols or reserved Fortran identifiers."""
+        cfg = self._minimal_config()
+        cfg['parameters']['biogeochemical'].append({'name': 'o2', 'value': 0.2})
+        self._assert_error_contains(cfg, "not unique")
+
+        cfg = self._minimal_config()
+        cfg['parameters']['biogeochemical'] = [{'name': 'integer', 'value': 2.0}]
+        self._assert_error_contains(cfg, "reserved")
+
     def test_multiple_errors_reported_together(self):
         """Multiple errors are collected and shown in a single exception."""
         cfg = self._minimal_config()
