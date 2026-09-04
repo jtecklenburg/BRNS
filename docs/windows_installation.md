@@ -204,7 +204,7 @@ jupyter notebook notebooks\plot_results.ipynb
 Open the notebook and update the result-path cell if the output folder is different from the default path. To use another result folder without editing the notebook, set `BRNS_RESULT_DIR` before executing it:
 
 ```powershell
-$env:BRNS_RESULT_DIR = "build_output/single_species_example/results"
+$env:BRNS_RESULT_DIR = Join-Path $PWD "build_output\single_species_example\results"
 jupyter nbconvert `
    --to notebook `
    --execute `

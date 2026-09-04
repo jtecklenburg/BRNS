@@ -182,7 +182,7 @@ Then run again.
 Open `notebooks/plot_results.ipynb` and change the example path in the first code cell if needed. The notebook expects a result directory with `.dat` files and then plots them by depth or time snapshot. To use another result folder, set `BRNS_RESULT_DIR` before opening or executing it:
 
 ```bash
-BRNS_RESULT_DIR=build_output/single_species_example/results \
+BRNS_RESULT_DIR="$(pwd)/build_output/single_species_example/results" \
 jupyter nbconvert \
   --to notebook \
   --execute \

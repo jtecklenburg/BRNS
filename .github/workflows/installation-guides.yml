@@ -44,10 +44,10 @@ jobs:
 
       - name: Execute result notebook
         env:
-          BRNS_RESULT_DIR: build_output/single_species_example/results
           BRNS_RESULT_LABEL: Linux / WSL
         run: |
           . .venv/bin/activate
+          export BRNS_RESULT_DIR="$PWD/build_output/single_species_example/results"
           jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=120 --output executed_plot_results.ipynb notebooks/plot_results.ipynb
 
       - name: Upload executed notebook
@@ -115,11 +115,11 @@ jobs:
         shell: msys2 {0}
         env:
           PYTHONUTF8: "1"
-          BRNS_RESULT_DIR: build_output/single_species_example/results
           BRNS_RESULT_LABEL: Windows
         run: |
           . .venv/Scripts/activate
           export PATH="$PWD/.ci-bin:$PATH"
+          export BRNS_RESULT_DIR="$(cygpath -w "$PWD")\\build_output\\single_species_example\\results"
           jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=120 --output executed_plot_results.ipynb notebooks/plot_results.ipynb
 
       - name: Upload executed notebook
