@@ -300,8 +300,8 @@ class TestFormulaEvaluatorIntegration:
                     's_dens': 2.5
                 },
                 'biogeochemical': [
-                    {'name': 'x', 'value': 200.0},
-                    {'name': 'y', 'value': 21.0},
+                    {'name': 'om_x', 'value': 200.0},
+                    {'name': 'om_y', 'value': 21.0},
                     {'name': 'SD', 'value': 's_dens*(1-por0)/por0*1000'}
                 ]
             }
@@ -313,7 +313,7 @@ class TestFormulaEvaluatorIntegration:
         # Check base parameters
         assert result['por0'] == 0.85
         assert result['s_dens'] == 2.5
-        assert result['x'] == 200.0
+        assert result['om_x'] == 200.0
         
         # Check computed parameter
         expected_SD = 2.5 * (1 - 0.85) / 0.85 * 1000

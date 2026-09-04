@@ -587,8 +587,11 @@ class ACGOrchestrator:
                     "Use unique names across species and parameters."
                 ))
 
-        for _, pname, _, value_path in self._iter_parameter_entries(params):
-            if pname.lower() in reserved_fortran_names:
+        for section_name, pname, _, value_path in self._iter_parameter_entries(params):
+            if (
+                section_name not in ('physical', 'physical_flags')
+                and pname.lower() in reserved_fortran_names
+            ):
                 issues.append(ValidationIssue(
                     'ERROR', value_path,
                     f"Parameter name '{pname}' is a reserved Fortran identifier and would overwrite generated code variables.",
@@ -1146,8 +1149,8 @@ class ACGOrchestrator:
         stoich_cfg = params_cfg.get('stoichiometry', {})
         if not isinstance(stoich_cfg, dict):
             stoich_cfg = {}
-        for name in ('x', 'y', 'z'):
-            value = stoich_cfg.get(name, None)
+        for name, raw_value in stoich_cfg.items():
+            value = raw_value
             if value is None:
                 value = self.evaluated_params.get(name, None) if self.evaluated_params else None
             if isinstance(value, (int, float)):
@@ -1650,16 +1653,16 @@ class ACGOrchestrator:
                     ) from exc
 
         # dC_i/dt = sum_j stoich[j, i] * rate_j
-        # Maple reference resolves stoichiometric constants x,y,z numerically
-        # in ssrates.f, while keeping SD symbolic.
+        # Resolve numeric stoichiometric constants while keeping values such as
+        # SD symbolic for the generated Fortran expressions.
         # Use exact Integer/Rational for same reason as run_preprocessing().
         numeric_subs = {}
         params_cfg = self._get_parameters_mapping()
         stoich_cfg = params_cfg.get('stoichiometry', {}) if self.config else {}
         if not isinstance(stoich_cfg, dict):
             stoich_cfg = {}
-        for name in ('x', 'y', 'z'):
-            value = stoich_cfg.get(name, None)
+        for name, raw_value in stoich_cfg.items():
+            value = raw_value
             if value is None:
                 value = self.evaluated_params.get(name, None) if self.evaluated_params else None
             if isinstance(value, (int, float)):

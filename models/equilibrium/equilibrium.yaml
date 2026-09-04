@@ -488,11 +488,11 @@ parameters:
       value: 23.0e-3*87.0
       description: "MnO2 molar mass × conversion"
 
-  # Stoichiometry coefficients (from Maple: x, y, z, s_dens)
+  # Organic-matter stoichiometry coefficients (from Maple: x, y, z, s_dens)
   stoichiometry:
-    x: 200.0
-    y: 21.0
-    z: 0.0
+    om_x: 200.0
+    om_y: 21.0
+    om_z: 0.0
     s_dens: 2.5
 
   physical:
@@ -541,10 +541,10 @@ reactions:
       fo2: "ho2 + (1.0 - ho2)*(o2/kmo2)"
     stoichiometry:
       ch2o: -1
-      o2: "- SD*(x+2*y)/x"
-      no3: "SD*(y/x)"
-      co2: "(x+y+2*z)/x * SD"
-      hco3: "- (y+2*z)/x * SD"
+      o2: "- SD*(om_x+2*om_y)/om_x"
+      no3: "SD*(om_y/om_x)"
+      co2: "(om_x+om_y+2*om_z)/om_x * SD"
+      hco3: "- (om_y+2*om_z)/om_x * SD"
 
   - id: 2
     name: "denitrification"
@@ -556,9 +556,9 @@ reactions:
       fno3: "hno3*(1-fo2)*(hno3f2 + (1.0 - hno3f2)*(no3/kmno3))"
     stoichiometry:
       ch2o: -1
-      no3: "- (4*x + 3*y)/(5*x) * SD"
-      co2: "(x-3*y+10*z)/(5*x) * SD"
-      hco3: "(4*x+3*y-10*z)/(5*x) * SD"
+      no3: "- (4*om_x + 3*om_y)/(5*om_x) * SD"
+      co2: "(om_x-3*om_y+10*om_z)/(5*om_x) * SD"
+      hco3: "(4*om_x+3*om_y-10*om_z)/(5*om_x) * SD"
 
   - id: 6
     name: "sulfate_reduction"
@@ -572,9 +572,9 @@ reactions:
       ch2o: -1
       so4: "- SD/2"
       h2s: "SD/2"
-      co2: "-(y-2*z)*SD/x"
-      hco3: "(x+y-2*z)*SD/x"
-      nh4: "(y/x)*SD"
+      co2: "-(om_y-2*om_z)*SD/om_x"
+      hco3: "(om_x+om_y-2*om_z)*SD/om_x"
+      nh4: "(om_y/om_x)*SD"
 
   - id: 7
     name: "nitrification"
@@ -601,9 +601,9 @@ reactions:
       ch2o: -1
       mno2: -2
       mn2: "2*SD"
-      co2: "- (3*x+y-2*z)*SD/x"
-      hco3: "(4*x+y-2*z)*SD/x"
-      nh4: "(y/x)*SD"
+      co2: "- (3*om_x+om_y-2*om_z)*SD/om_x"
+      hco3: "(4*om_x+om_y-2*om_z)*SD/om_x"
+      nh4: "(om_y/om_x)*SD"
 
   - id: 9
     name: "manganese_oxidation"
@@ -630,9 +630,9 @@ reactions:
       ch2o: -1
       feoh3: -4
       fe2: "4*SD"
-      co2: "- (7*x+y-2*z)*SD/x"
-      hco3: "(8*x+y-2*z)*SD/x"
-      nh4: "(y/x)*SD"
+      co2: "- (7*om_x+om_y-2*om_z)*SD/om_x"
+      hco3: "(8*om_x+om_y-2*om_z)*SD/om_x"
+      nh4: "(om_y/om_x)*SD"
 
   - id: 11
     name: "iron_oxidation_o2"
