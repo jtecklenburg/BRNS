@@ -198,15 +198,25 @@ mkdir -p "$PYTHON_GEN"
 cd "$PYTHON_GEN"
 
 echo "Running Python code generator..."
+PYTHON_YAML_CONFIG="$YAML_CONFIG"
+PYTHON_YAML_DIR="$(dirname "$YAML_CONFIG")"
+PYTHON_SCRIPT_DIR="$SCRIPT_DIR"
+
+if command -v cygpath &>/dev/null; then
+    PYTHON_YAML_CONFIG="$(cygpath -w "$YAML_CONFIG")"
+    PYTHON_YAML_DIR="$(cygpath -w "$PYTHON_YAML_DIR")"
+    PYTHON_SCRIPT_DIR="$(cygpath -w "$PYTHON_SCRIPT_DIR")"
+fi
+
 python3 -c "
 import sys
-sys.path.insert(0, '$(dirname "$YAML_CONFIG")')
-sys.path.insert(0, '$SCRIPT_DIR')
+sys.path.insert(0, '$PYTHON_YAML_DIR')
+sys.path.insert(0, '$PYTHON_SCRIPT_DIR')
 
 from acg_brns.acg_orchestrator import ACGOrchestrator
 
 try:
-    orchestrator = ACGOrchestrator('$YAML_CONFIG', '.')
+    orchestrator = ACGOrchestrator('$PYTHON_YAML_CONFIG', '.')
     orchestrator.load_config()
     print(f'✓ Loaded YAML: {orchestrator.config.get(\"model_name\", \"unknown\")}')
     
