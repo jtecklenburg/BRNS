@@ -105,8 +105,8 @@ class TestBioArrayBuilding(unittest.TestCase):
         self.assertEqual(bio_name, ['kfox', 'kmo2', 'ho2'])
         self.assertEqual(bio_val, [0.221, 8.0e-6, 0.0])
 
-    def test_bio_arrays_include_all_first_level_parameter_sections(self):
-        """All parameters.* sections on first level must be included."""
+    def test_bio_arrays_exclude_physical_parameter_sections(self):
+        """Physical parameters and flags belong to separate COMMON blocks."""
         config = {
             'parameters': {
                 'biogeochemical': [
@@ -114,6 +114,9 @@ class TestBioArrayBuilding(unittest.TestCase):
                 ],
                 'physical': {
                     'por0': 0.8,
+                },
+                'physical_flags': {
+                    'ipor': 0,
                 },
                 'custom': [
                     {'name': 'k_custom', 'value': '2*por0'},
@@ -124,14 +127,15 @@ class TestBioArrayBuilding(unittest.TestCase):
         evaluated = {
             'kfox': 0.221,
             'por0': 0.8,
+            'ipor': 0,
             'k_custom': 1.6,
         }
         mapper = YAMLtoACGMapper(config, evaluated)
 
         bio_name, bio_val = mapper.build_bio_arrays()
 
-        self.assertEqual(bio_name, ['kfox', 'por0', 'k_custom'])
-        self.assertEqual(bio_val, [0.221, 0.8, 1.6])
+        self.assertEqual(bio_name, ['kfox', 'k_custom'])
+        self.assertEqual(bio_val, [0.221, 1.6])
 
 
 class TestVariablesList(unittest.TestCase):

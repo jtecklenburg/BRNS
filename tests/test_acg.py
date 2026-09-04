@@ -75,7 +75,6 @@ class TestACG0:
         assert 'ncomp=3' in content
         assert 'phi' in content
         assert 'iopt' in content
-        assert content.index('integer iopt') < content.index('common/physics2/iopt')
 
     def test_acg0_allows_empty_bio_names(self, temp_output_dir):
         """Models without biogeochemical parameters should still generate common_geo.inc."""

@@ -320,19 +320,19 @@ class ACGModule:
         # Biogeochemical parameters
         if bio_names:
             code.extend(
-                [declaref('real*8', bio_names), commonf('kinetics', bio_names)]
+                [commonf('kinetics', bio_names), declaref('real*8', bio_names)]
             )
 
         # Physical parameters (real*8)
         if phys_names:
             code.extend(
-                [declaref('real*8', phys_names), commonf('physics', phys_names)]
+                [commonf('physics', phys_names), declaref('real*8', phys_names)]
             )
 
         # Integer parameters
         if phys_names2:
             code.extend(
-                [declaref('integer', phys_names2), commonf('physics2', phys_names2)]
+                [commonf('physics2', phys_names2), declaref('integer', phys_names2)]
             )
 
         # Generate file

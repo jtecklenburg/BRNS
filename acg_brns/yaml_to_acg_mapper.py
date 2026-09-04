@@ -139,7 +139,9 @@ class YAMLtoACGMapper:
         """
         Build bio_name and bio_val arrays for acg3() (bioparams).
 
-        Includes all first-level `parameters.*` entries in declaration order.
+        Includes non-physical first-level `parameters.*` entries in declaration
+        order. Physical values and their flags are emitted separately into the
+        `physics` and `physics2` COMMON blocks.
         
         Returns:
             Tuple of (bio_name, bio_val):
@@ -153,20 +155,36 @@ class YAMLtoACGMapper:
         if not isinstance(params_cfg, dict):
             return bio_name, bio_val
 
-        for name, val in self._iter_parameter_entries():
-            bio_name.append(name)
+        for section_name, section_data in params_cfg.items():
+            if section_name in ('physical', 'physical_flags'):
+                continue
 
-            if name in self.params:
-                bio_val.append(float(self.params[name]))
-            elif isinstance(val, (int, float)):
-                # Allow explicit numeric literals from YAML only.
-                # Formula-based parameters must be evaluated before mapping.
-                bio_val.append(float(val))
-            else:
-                raise ValueError(
-                    f"Parameter '{name}' has no evaluated numeric value. "
-                    f"Original value: {val!r}"
+            if isinstance(section_data, dict):
+                entries = section_data.items()
+            elif isinstance(section_data, list):
+                entries = (
+                    (item.get('name'), item.get('value'))
+                    for item in section_data
+                    if isinstance(item, dict) and isinstance(item.get('name'), str)
+                    and 'value' in item
                 )
+            else:
+                continue
+
+            for name, val in entries:
+                bio_name.append(name)
+
+                if name in self.params:
+                    bio_val.append(float(self.params[name]))
+                elif isinstance(val, (int, float)):
+                    # Allow explicit numeric literals from YAML only.
+                    # Formula-based parameters must be evaluated before mapping.
+                    bio_val.append(float(val))
+                else:
+                    raise ValueError(
+                        f"Parameter '{name}' has no evaluated numeric value. "
+                        f"Original value: {val!r}"
+                    )
         
         return bio_name, bio_val
     
