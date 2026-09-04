@@ -83,6 +83,8 @@ jobs:
 
       - name: Create and activate virtual environment
         shell: msys2 {0}
+        env:
+          PYTHONUTF8: "1"
         run: |
           PYTHON_EXE="$(cygpath -u "$pythonLocation")/python.exe"
           "$PYTHON_EXE" -m venv .venv
@@ -102,6 +104,8 @@ jobs:
 
       - name: Run the minimal example
         shell: msys2 {0}
+        env:
+          PYTHONUTF8: "1"
         run: |
           . .venv/Scripts/activate
           export PATH="$PWD/.ci-bin:$PATH"
@@ -110,6 +114,7 @@ jobs:
       - name: Execute result notebook
         shell: msys2 {0}
         env:
+          PYTHONUTF8: "1"
           BRNS_RESULT_DIR: build_output/single_species_example/results
           BRNS_RESULT_LABEL: Windows
         run: |
