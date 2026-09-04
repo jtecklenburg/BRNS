@@ -136,6 +136,7 @@ You should see files such as:
 Use the build script from the repository root:
 
 ```bash
+chmod +x ./build_python.sh
 ./build_python.sh -c ./models/single_species/single_species_example.yaml -i ./models/single_species
 ```
 
