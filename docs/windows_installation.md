@@ -197,8 +197,19 @@ Then start Jupyter:
 ```powershell
 jupyter notebook notebooks\plot_results.ipynb
 ```
+Open the notebook and update the result-path cell if the output folder is different from the default path. To use another result folder without editing the notebook, set `BRNS_RESULT_DIR` before executing it:
 
-Open the notebook and update the result-path cell if the output folder is different from the default path.
+```powershell
+$env:BRNS_RESULT_DIR = "build_output/single_species_example/results"
+jupyter nbconvert `
+   --to notebook `
+   --execute `
+   --ExecutePreprocessor.timeout=120 `
+   --output executed_plot_results.ipynb `
+   notebooks/plot_results.ipynb
+```
+
+This creates `notebooks/executed_plot_results.ipynb`, which contains the figures and cell output. The selected directory must contain the simulation `.dat` files.
 
 ---
 
@@ -231,4 +242,4 @@ chmod +x ./build_python.sh
 
 ### Notebook cannot find result files
 
-Open the notebook and update the `RESULT_DIR` to the exact generated folder printed by the script.
+Set `$env:BRNS_RESULT_DIR` to the exact generated result folder before opening or executing the notebook.

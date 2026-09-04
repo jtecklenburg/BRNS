@@ -176,6 +176,16 @@ python -m pip install notebook jupyter
 
 Then run again.
 
-### Adjust the notebook to your result folder
+Open `notebooks/plot_results.ipynb` and change the example path in the first code cell if needed. The notebook expects a result directory with `.dat` files and then plots them by depth or time snapshot. To use another result folder, set `BRNS_RESULT_DIR` before opening or executing it:
 
-Open `notebooks/plot_results.ipynb` and change the example path in the first code cell if needed. The notebook expects a result directory with `.dat` files and then plots them by depth or time snapshot.
+```bash
+BRNS_RESULT_DIR=build_output/single_species_example/results \
+jupyter nbconvert \
+  --to notebook \
+  --execute \
+  --ExecutePreprocessor.timeout=120 \
+  --output executed_plot_results.ipynb \
+  notebooks/plot_results.ipynb
+```
+
+This creates `notebooks/executed_plot_results.ipynb`, which contains the figures and cell output. The selected directory must contain the simulation `.dat` files.

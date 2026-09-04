@@ -1,0 +1,116 @@
+name: Test Installation Guides
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  linux-wsl-guide:
+    name: Linux / WSL guide
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install Fortran compiler and linear algebra libraries
+        run: |
+          sudo apt update
+          sudo apt install -y gfortran liblapack-dev libblas-dev
+          gfortran --version
+
+      - name: Create and activate virtual environment
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          python -m pip install --upgrade pip
+          python -m pip install "macrofor @ git+https://github.com/jtecklenburg/macrofor.git"
+          python -m pip install -e .
+          python -m pip install notebook jupyter nbconvert matplotlib
+
+      - name: Run the minimal example
+        run: |
+          . .venv/bin/activate
+          ./build_python.sh -c ./models/single_species/single_species_example.yaml -i ./models/single_species
+
+      - name: Execute result notebook
+        env:
+          BRNS_RESULT_DIR: build_output/single_species_example/results
+          BRNS_RESULT_LABEL: Linux / WSL
+        run: |
+          . .venv/bin/activate
+          jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=120 --output executed_plot_results.ipynb notebooks/plot_results.ipynb
+
+      - name: Upload executed notebook
+        uses: actions/upload-artifact@v4
+        with:
+          name: executed-plot-results-linux-wsl
+          path: notebooks/executed_plot_results.ipynb
+          if-no-files-found: error
+
+  windows-guide:
+    name: Windows guide
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Set up MSYS2 Fortran toolchain
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc-fortran
+            mingw-w64-x86_64-lapack
+
+      - name: Create and activate virtual environment
+        shell: msys2 {0}
+        run: |
+          python -m venv .venv
+          . .venv/Scripts/activate
+          python -m pip install --upgrade pip
+          python -m pip install "macrofor @ git+https://github.com/jtecklenburg/macrofor.git"
+          python -m pip install -e .
+          python -m pip install notebook jupyter nbconvert matplotlib
+          mkdir -p .ci-bin
+          ln -sf "$(command -v python)" .ci-bin/python3
+          printf '%s\n' "$PWD/.ci-bin" >> "$GITHUB_PATH"
+          gfortran --version
+
+      - name: Run the minimal example
+        shell: msys2 {0}
+        run: |
+          export PATH="$PWD/.ci-bin:$PATH"
+          ./build_python.sh -c ./models/single_species/single_species_example.yaml -i ./models/single_species
+
+      - name: Execute result notebook
+        shell: msys2 {0}
+        env:
+          BRNS_RESULT_DIR: build_output/single_species_example/results
+          BRNS_RESULT_LABEL: Windows
+        run: |
+          export PATH="$PWD/.ci-bin:$PATH"
+          jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=120 --output executed_plot_results.ipynb notebooks/plot_results.ipynb
+
+      - name: Upload executed notebook
+        uses: actions/upload-artifact@v4
+        with:
+          name: executed-plot-results-windows
+          path: notebooks/executed_plot_results.ipynb
+          if-no-files-found: error
