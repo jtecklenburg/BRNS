@@ -249,8 +249,8 @@ class TestFormulaEvaluation:
         for expected in ('exp', 'sqrt', 'asin', 'tanh', 'ceil', 'floor', 'min', 'max'):
             assert expected in names
     
-    def test_complex_formula_canfield_style(self):
-        """Test complex formula similar to Canfield model"""
+    def test_complex_formula_equilibrium_model_style(self):
+        """Test complex formula similar to the equilibrium model"""
         config = {
             'parameters': {
                 'physical': {
@@ -267,7 +267,7 @@ class TestFormulaEvaluation:
         assert 'T' in evaluator.evaluated
         assert abs(evaluator.evaluated['T'] - 283.45) < 1e-10
         
-        # Evaluate mlogkp1 formula from Canfield
+        # Evaluate mlogkp1 formula from the equilibrium model
         formula = "-13.7201 + 0.031334*T + 3235.67/T + 1.3e-5*S*T - 0.1032*sqrt(S)"
         result = evaluator.evaluate_formula(formula, evaluator.evaluated)
         
@@ -656,11 +656,11 @@ class TestErrorHandling:
             evaluator.evaluate_formula("invalid syntax )(", {})
 
 
-class TestRealWorldCanfieldModel:
-    """Integration tests with realistic Canfield model data"""
+class TestRealWorldEquilibriumModel:
+    """Integration tests with realistic equilibrium model data"""
     
-    def test_canfield_parameters(self):
-        """Test evaluation of key Canfield model parameters"""
+    def test_equilibrium_model_parameters(self):
+        """Test evaluation of key equilibrium model parameters"""
         config = {
             'parameters': {
                 'physical': {

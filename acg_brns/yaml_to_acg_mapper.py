@@ -625,7 +625,7 @@ class YAMLtoACGMapper:
 
 
 def main():
-    """Example usage with Canfield model."""
+    """Example usage with the equilibrium model"""
     import yaml
     import os
     import sys

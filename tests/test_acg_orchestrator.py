@@ -299,14 +299,14 @@ class TestPhaseExecution(unittest.TestCase):
     """Test individual pipeline phases."""
     
     def setUp(self):
-        """Set up test with Canfield model."""
+        """Set up test with the equilibrium model."""
         self.yaml_path = 'models/equilibrium/equilibrium.yaml'
         self.temp_dir = tempfile.mkdtemp()
         self.output_dir = Path(self.temp_dir) / 'output'
         
-        # Check if Canfield YAML exists
+        # Check if the equilibrium model YAML exists
         if not Path(self.yaml_path).exists():
-            self.skipTest(f"Canfield YAML not found: {self.yaml_path}")
+            self.skipTest(f"The equilibrium model YAML not found: {self.yaml_path}")
         
         self.orchestrator = ACGOrchestrator(
             self.yaml_path,
@@ -378,13 +378,13 @@ class TestParameterExtraction(unittest.TestCase):
     """Test extraction of parameters from YAML."""
     
     def setUp(self):
-        """Set up test with Canfield model."""
+        """Set up test with the equilibrium model."""
         self.yaml_path = 'models/equilibrium/equilibrium.yaml'
         self.temp_dir = tempfile.mkdtemp()
         self.output_dir = Path(self.temp_dir) / 'output'
         
         if not Path(self.yaml_path).exists():
-            self.skipTest(f"Canfield YAML not found: {self.yaml_path}")
+            self.skipTest(f"Equilibrium model YAML not found: {self.yaml_path}")
         
         self.orchestrator = ACGOrchestrator(
             self.yaml_path,
@@ -438,17 +438,17 @@ class TestParameterExtraction(unittest.TestCase):
         self.assertEqual(len(params['iniconc']), ncompo)
 
 
-class TestIntegrationCanfield(unittest.TestCase):
-    """Integration test with full Canfield model."""
+class TestIntegrationEquilibriumModel(unittest.TestCase):
+    """Integration test with the full equilibrium model."""
     
     def setUp(self):
         """Set up test."""
         self.yaml_path = 'models/equilibrium/equilibrium.yaml'
         self.temp_dir = tempfile.mkdtemp()
-        self.output_dir = Path(self.temp_dir) / 'canfield'
+        self.output_dir = Path(self.temp_dir) / 'output'
         
         if not Path(self.yaml_path).exists():
-            self.skipTest(f"Canfield YAML not found: {self.yaml_path}")
+            self.skipTest(f"Equilibrium model YAML not found: {self.yaml_path}")
     
     def tearDown(self):
         """Clean up."""
@@ -1038,7 +1038,7 @@ class TestValidationMessages(unittest.TestCase):
     def test_r5_rate_uses_rate_component_names_ok(self):
         """R-5: top-level 'rate' may reference names defined in rate_components."""
         cfg = self._minimal_config()
-        # Canfield-style: rate references helpers defined in rate_components
+        # equilibrium model-style: rate references helpers defined in rate_components
         cfg['reactions'][0]['rate'] = 'kch2o_helper * fo2_helper'
         cfg['reactions'][0]['rate_components'] = {
             'kch2o_helper': 'kox * ch2o',
@@ -1458,8 +1458,8 @@ class TestPlausibilityValidation(unittest.TestCase):
         warnings = [i for i in issues if 'bc_upper_type' in i.location]
         self.assertEqual(warnings, [], f"No warning expected for valid bc_type=1: {warnings}")
 
-    def test_n1_canfield_por0_no_warning(self):
-        """Canfield model has por0=0.85 — must produce no por0 warning."""
+    def test_n1_equilibrium_model_por0_no_warning(self):
+        """Equilibrium model has por0=0.85 — must produce no por0 warning."""
         cfg = self._minimal_config()
         cfg['parameters']['physical']['por0'] = 0.85
         issues = self._run(cfg)

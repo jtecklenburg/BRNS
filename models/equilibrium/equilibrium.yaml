@@ -30,8 +30,8 @@ units:
 # ======================================================================
 
 output:
-  directory: "../generated_fortran/canfield"
-  prefix: "canfield"
+  directory: "../generated_fortran/equilibrium"
+  prefix: "equilibrium"
   timing:
     start: 1.0
     interval: 1.0
@@ -878,7 +878,7 @@ computed_values:
 # ======================================================================
 
 notes:
-  - "This model implements the full Canfield diagenetic redox cascade"
+  - "This model implements the full diagenetic redox cascade"
   - "Equilibrium reactions (3, 4, 13) are solved algebraically"
   - "Mineral precipitation/dissolution uses saturation state (omega)"
   - "Switch variables (sw17, sw18, sw19) control precip vs. diss kinetics"

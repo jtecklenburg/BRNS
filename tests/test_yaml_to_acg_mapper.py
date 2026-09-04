@@ -154,7 +154,7 @@ class TestVariablesList(unittest.TestCase):
         """Test that species order matches YAML definition order.
 
         The mapper preserves the YAML species order (model-specific ordering).
-        For the Canfield model solid species are interleaved among dissolved ones
+        For the equilibrium model solid species are interleaved among dissolved ones
         (e.g. ch2o at index 7, mno2 at 11), so no dissolved-first reordering
         is performed.
         """
@@ -700,12 +700,12 @@ class TestGlobalRateComponentExpansion(unittest.TestCase):
         self.assertNotIn('(1)', reactions[0]['rate_expanded'])
 
 
-class TestIntegrationWithCanfield(unittest.TestCase):
-    """Integration tests with full Canfield model."""
+class TestIntegrationWithEquilibriumModel(unittest.TestCase):
+    """Integration tests with full equilibrium model."""
     
     @classmethod
     def setUpClass(cls):
-        """Load Canfield YAML and create mapper."""
+        """Load equilibrium model YAML and create mapper."""
         yaml_path = os.path.join(
             os.path.dirname(os.path.dirname(__file__)),
             'models',
@@ -714,7 +714,7 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         )
 
         if not os.path.exists(yaml_path):
-            raise unittest.SkipTest(f"Canfield YAML not found: {yaml_path}")
+            raise unittest.SkipTest(f"Equilibrium model YAML not found: {yaml_path}")
         
         with open(yaml_path, 'r') as f:
             cls.config = yaml.safe_load(f)
@@ -726,8 +726,8 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         # Create mapper
         cls.mapper = YAMLtoACGMapper(cls.config, cls.evaluated)
     
-    def test_canfield_species_count(self):
-        """Test that Canfield model has correct species count."""
+    def test_equilibrium_model_species_count(self):
+        """Test that the equilibrium model has correct species count."""
         variables = self.mapper.build_variables_list()
         
         # 12 dissolved + 6 solid = 18 total
@@ -739,8 +739,8 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         self.assertEqual(len(dissolved), 12)
         self.assertEqual(len(solid), 6)
     
-    def test_canfield_reaction_count(self):
-        """Test that Canfield model has correct reaction count."""
+    def test_equilibrium_model_reaction_count(self):
+        """Test that the equilibrium model has correct reaction count."""
         reactions = self.mapper.build_rate_expressions()
         
         # 16 kinetic + 3 equilibrium = 19 total
@@ -752,8 +752,8 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         self.assertEqual(len(equilibrium_rxns), 3)
         self.assertEqual(len(kinetic_rxns), 16)
     
-    def test_canfield_stoichiometry_matrix(self):
-        """Test Canfield stoichiometry matrix dimensions."""
+    def test_equilibrium_model_stoichiometry_matrix(self):
+        """Test equilibrium model stoichiometry matrix dimensions."""
         stoich = self.mapper.build_stoichiometry_matrix(self.evaluator)
         
         self.assertEqual(stoich.shape, (19, 18))  # 19 reactions, 18 species
@@ -763,8 +763,8 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         self.assertGreater(non_zero, 50)  # Should have many non-zero coefficients
         self.assertLess(non_zero, 200)    # But not all entries
     
-    def test_canfield_bio_arrays(self):
-        """Test Canfield biogeochemical parameters."""
+    def test_equilibrium_model_bio_arrays(self):
+        """Test equilibrium model biogeochemical parameters."""
         bio_name, bio_val = self.mapper.build_bio_arrays()
         
         # Should have many biogeochemical parameters
@@ -779,8 +779,8 @@ class TestIntegrationWithCanfield(unittest.TestCase):
         self.assertIn('kmo2', bio_name)
         self.assertIn('kmno3', bio_name)
     
-    def test_canfield_rate_expressions(self):
-        """Test that all Canfield reactions have valid rate expressions."""
+    def test_equilibrium_model_rate_expressions(self):
+        """Test that all equilibrium model reactions have valid rate expressions."""
         reactions = self.mapper.build_rate_expressions()
         
         for rxn in reactions:

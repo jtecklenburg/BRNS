@@ -606,7 +606,7 @@ class ACGOrchestrator:
             return issues
 
         # Collect ALL rate_component keys across all reactions into a global
-        # helper pool. In models like Canfield, helpers defined in one reaction
+        # helper pool. In models like the equilibrium model, helpers defined in one reaction
         # (e.g. kch2o, fo2) are referenced in other reactions' rate strings.
         all_rate_comp_names: set = set()
         for rxn in reactions:
@@ -1791,7 +1791,7 @@ class ACGOrchestrator:
 
 
 def main():
-    """Example usage with Canfield model."""
+    """Example usage with the equilibrium model"""
     import sys
     
     # Default paths
