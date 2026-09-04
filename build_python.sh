@@ -210,13 +210,14 @@ fi
 
 python3 -c "
 import sys
-sys.path.insert(0, '$PYTHON_YAML_DIR')
-sys.path.insert(0, '$PYTHON_SCRIPT_DIR')
+yaml_config, yaml_dir, script_dir = sys.argv[1:4]
+sys.path.insert(0, yaml_dir)
+sys.path.insert(0, script_dir)
 
 from acg_brns.acg_orchestrator import ACGOrchestrator
 
 try:
-    orchestrator = ACGOrchestrator('$PYTHON_YAML_CONFIG', '.')
+    orchestrator = ACGOrchestrator(yaml_config, '.')
     orchestrator.load_config()
     print(f'✓ Loaded YAML: {orchestrator.config.get(\"model_name\", \"unknown\")}')
     
@@ -237,7 +238,7 @@ except Exception as e:
     import traceback
     traceback.print_exc()
     sys.exit(1)
-" || exit 1
+" "$PYTHON_YAML_CONFIG" "$PYTHON_YAML_DIR" "$PYTHON_SCRIPT_DIR" || exit 1
 
 echo ""
 
