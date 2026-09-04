@@ -23,10 +23,12 @@ Open a terminal and run:
 
 ```bash
 sudo apt update
-sudo apt install -y python3 python3-pip python3-venv git build-essential
+sudo apt install -y python3 python3-pip python3-venv git build-essential \
+  liblapack-dev libblas-dev
 ```
 
-This installs the basic software needed for Python and compilation.
+This installs the basic software needed for Python and compilation, including
+the BLAS and LAPACK libraries required when linking the BRNS executable.
 
 ### Check that Python is available
 
@@ -172,7 +174,7 @@ jupyter notebook notebooks/plot_results.ipynb
 If `jupyter` is not installed yet, install it with:
 
 ```bash
-python -m pip install notebook jupyter
+python -m pip install notebook jupyter nbconvert matplotlib
 ```
 
 Then run again.

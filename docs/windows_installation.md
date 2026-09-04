@@ -83,10 +83,14 @@ BRNS generates and compiles Fortran source files. You need a Fortran compiler su
 
    https://www.msys2.org/
 
-2. Start the MSYS2 terminal and install the GNU Fortran toolchain:
+2. Start the MSYS2 MINGW64 terminal and install the GNU Fortran toolchain,
+    LAPACK, and Git:
 
 ```bash
-pacman -S --needed mingw-w64-x86_64-gcc-fortran
+pacman -S --needed \
+   git \
+   mingw-w64-x86_64-gcc-fortran \
+   mingw-w64-x86_64-lapack
 ```
 
 3. Verify the installation:
@@ -189,7 +193,7 @@ The exact directory name depends on the model and output options.
 After the model run finishes, install Jupyter in the environment if needed:
 
 ```powershell
-python -m pip install notebook jupyter
+python -m pip install notebook jupyter nbconvert matplotlib
 ```
 
 Then start Jupyter:
