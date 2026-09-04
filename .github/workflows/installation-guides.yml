@@ -92,7 +92,11 @@ jobs:
           python -m pip install -e .
           python -m pip install notebook jupyter nbconvert matplotlib
           mkdir -p .ci-bin
-          ln -sf "$PWD/.venv/Scripts/python.exe" .ci-bin/python3
+          cat > .ci-bin/python3 <<'EOF'
+          #!/usr/bin/env bash
+          "$(dirname "$0")/../.venv/Scripts/python.exe" "$@"
+          EOF
+          chmod +x .ci-bin/python3
           printf '%s\n' "$PWD/.ci-bin" >> "$GITHUB_PATH"
           gfortran --version
 
