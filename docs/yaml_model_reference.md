@@ -322,7 +322,7 @@ The ACG generator supports three explicit initialization modes, implemented in `
 | --- | --- | --- |
 | `1` | Read initial profiles from `initialconc.txt` | `species.init_value` is not used.  |
 | `2` | Constant initial conditions everywhere in the domain | Reads `species.init_value`. |
-| `3` | Read initial conditions from files | The generator reads one profile file per species with file name species.name with ending `.inp`; example "co2.inp" ; `species.init_value` is not used. |
+| `3` | Read initial conditions from files, for example output files with simulation results. | The generator reads one profile file per species with file name species.name with ending `.inp`; example "co2.inp" ; `species.init_value` is not used. |
 
 Typical fields and expected data types:
 
