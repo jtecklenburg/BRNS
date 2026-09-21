@@ -1,17 +1,12 @@
 ﻿# ======================================================================
 # BRNS Model Configuration - Column Volatile Compounds (All Columns)
 # ======================================================================
-# Converted from maple/notebooks/switches/Column_volatile_compounds-full-all_columns.md
-# using skill dev_docs/skills/md_to_brns_yaml_skill.md
-# ======================================================================
 
 metadata:
   name: "Column Volatile Compounds - Full All Columns"
   description: "Multi-column volatile compounds model with 41 species and 41 reactions"
-  author: "P.A.G. Regnier / Jan Tecklenburg (Python port)"
-  version: "1.0"
-  date: "2026-05-13"
-  reference: "Column_volatile_compounds-full-all_columns"
+  author: "Khan, Ali M., Lukas Y. Wick, and Martin Thullner"
+  reference: "Khan, Ali M., Lukas Y. Wick, and Martin Thullner. Applying the Rayleigh approach for stable isotope-based analysis of VOC biodegradation in diffusion-dominated systems. Environmental science & technology 52.14 (2018): 7785-7795."
 
 units:
   L: cm
