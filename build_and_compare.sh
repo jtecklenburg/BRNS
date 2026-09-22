@@ -389,9 +389,59 @@ compare_results() {
     local MISSING=0
     local EXTRA=0
 
+    format_error_metrics() {
+        local ref_path=$1
+        local py_path=$2
+
+        if command -v python3 &>/dev/null; then
+            python3 - "$ref_path" "$py_path" <<'EOF' 2>/dev/null || true
+import sys
+import numpy as np
+
+def load_data(path):
+    try:
+        return np.loadtxt(path)
+    except Exception:
+        try:
+            return np.loadtxt(path, skiprows=1)
+        except Exception:
+            return None
+
+ref = load_data(sys.argv[1])
+py = load_data(sys.argv[2])
+if ref is not None and py is not None and ref.shape == py.shape:
+    diff = np.abs(ref - py)
+    rel = diff / (np.abs(ref) + 1e-15)
+    print(f" | max abs: {np.max(diff):.2e}, max rel: {np.max(rel):.2e}", end="")
+EOF
+        elif command -v python &>/dev/null; then
+            python - "$ref_path" "$py_path" <<'EOF' 2>/dev/null || true
+import sys
+import numpy as np
+
+def load_data(path):
+    try:
+        return np.loadtxt(path)
+    except Exception:
+        try:
+            return np.loadtxt(path, skiprows=1)
+        except Exception:
+            return None
+
+ref = load_data(sys.argv[1])
+py = load_data(sys.argv[2])
+if ref is not None and py is not None and ref.shape == py.shape:
+    diff = np.abs(ref - py)
+    rel = diff / (np.abs(ref) + 1e-15)
+    print(f" | max abs: {np.max(diff):.2e}, max rel: {np.max(rel):.2e}", end="")
+EOF
+        fi
+    }
+
     for file in $ALL_FILES; do
         local REF="reference/$file"
         local PY="python/$file"
+        local ERROR_METRICS="$(format_error_metrics "$REF" "$PY")"
 
         if [ ! -f "$REF" ] && [ -f "$PY" ]; then
             echo -e "${YELLOW}⊕ $file${NC} - Only in Python"
@@ -408,34 +458,12 @@ compare_results() {
         fi
 
         if diff -q "$REF" "$PY" >/dev/null 2>&1; then
-            echo -e "${GREEN}✓ $file${NC} - identical"
+            echo -e "${GREEN}✓ $file${NC} - identical${ERROR_METRICS}"
             ((IDENTICAL++))
         else
-            echo -e "${YELLOW}≈ $file${NC} - differences"
+            echo -e "${YELLOW}≈ $file${NC} - differences${ERROR_METRICS}"
             ALL_IDENTICAL=false
             ((DIFFERENT++))
-
-            # Numeric comparison (max abs only)
-            if command -v python3 &>/dev/null; then
-                python3 <<EOF 2>/dev/null || true
-import numpy as np
-def load_data(path):
-    try:
-        return np.loadtxt(path)
-    except Exception:
-        try:
-            return np.loadtxt(path, skiprows=1)
-        except Exception:
-            return None
-
-ref = load_data('$REF')
-py = load_data('$PY')
-if ref is not None and py is not None and ref.shape == py.shape:
-    diff = np.abs(ref - py)
-    rel = diff / (np.abs(ref) + 1e-15)
-    print(f"    Max abs: {np.max(diff):.2e}, rel: {np.max(rel):.2e}")
-EOF
-            fi
         fi
     done
     
