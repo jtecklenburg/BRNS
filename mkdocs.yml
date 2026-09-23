@@ -6,6 +6,8 @@ theme:
     palette:
         primary: "cyan"
         accent: "grey"
+    features:
+        - navigation.sections
 
 plugins:
     - search
@@ -29,14 +31,18 @@ extra_css:
     - https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css
 
 nav:
-    - "Start": README.md
-    - "Transport model": model.md
-    - "Reaction network example": reaction_term_rk_yaml.md
-    - "Literature": references.md
-    - "Linux / WSL installation": linux_installation.md
-    - "Windows installation": windows_installation.md
-    - "YAML Model Reference": yaml_model_reference.md
-    - "Developer pipeline": developer_pipeline.md
-    - "acg": api_acg.md
-    - "gaussian_elimination": api_gaussian_elimination.md
-    - "acg_orchestrator": api_acg_orchestrator.md
+    - Home:
+        - "Start": README.md
+    - Installation:
+        - "Linux / WSL": linux_installation.md
+        - "Windows": windows_installation.md        
+    - User Guide:
+        - "Transport model": model.md
+        - "Reaction network example": reaction_term_rk_yaml.md
+        - "Literature": references.md
+        - "YAML Model Reference": yaml_model_reference.md        
+    - Developer:        
+        - "Developer pipeline": developer_pipeline.md
+        - "acg": api_acg.md
+        - "gaussian_elimination": api_gaussian_elimination.md
+        - "acg_orchestrator": api_acg_orchestrator.md
