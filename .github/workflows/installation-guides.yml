@@ -50,6 +50,86 @@ jobs:
           export BRNS_RESULT_DIR="$PWD/build_output/single_species_example/results"
           jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=120 --output executed_plot_results.ipynb notebooks/plot_results.ipynb
 
+      - name: Validate BRNS output against reference
+        shell: bash
+        env:
+          BRNS_RESULT_DIR: ${{ github.workspace }}/build_output/single_species_example/results
+          BRNS_REFERENCE_DIR: ${{ github.workspace }}/tests/reference/single_species
+        run: |
+          set -euo pipefail
+          python3 - "$BRNS_RESULT_DIR" "$BRNS_REFERENCE_DIR" <<'PY'
+          import sys
+          from pathlib import Path
+
+          import numpy as np
+
+          def load_numeric(path: Path):
+              try:
+                  return np.loadtxt(path)
+              except Exception:
+                  try:
+                      return np.loadtxt(path, skiprows=1)
+                  except Exception as exc:
+                      raise ValueError(f"Could not parse numeric data from {path}: {exc}") from exc
+
+          result_dir = Path(sys.argv[1])
+          reference_dir = Path(sys.argv[2])
+
+          if not result_dir.exists():
+              raise SystemExit(f"ERROR: Result directory not found: {result_dir}")
+
+          result_files = sorted(p for p in result_dir.iterdir() if p.is_file())
+          if not result_files:
+              raise SystemExit(f"ERROR: No generated BRNS result files found in {result_dir}")
+
+          ref_files = sorted(p for p in reference_dir.iterdir() if p.is_file())
+          if not ref_files:
+              raise SystemExit(f"ERROR: Reference directory is empty or missing: {reference_dir}")
+
+          missing = []
+          mismatches = []
+
+          for ref_path in ref_files:
+              target = result_dir / ref_path.name
+              if not target.exists():
+                  missing.append(ref_path.name)
+                  continue
+
+              try:
+                  ref_data = load_numeric(ref_path)
+                  res_data = load_numeric(target)
+              except ValueError as exc:
+                  raise SystemExit(f"ERROR: {exc}") from exc
+
+              if ref_data.shape != res_data.shape:
+                  mismatches.append((ref_path.name, "shape mismatch", None))
+                  continue
+
+              diff = np.abs(ref_data - res_data)
+              rel = diff / (np.abs(ref_data) + 1e-15)
+              max_rel = float(np.max(rel)) if rel.size else 0.0
+
+              if not np.allclose(ref_data, res_data, rtol=1e-8, atol=1e-12):
+                  mismatches.append((ref_path.name, "values differ", max_rel))
+
+          if missing:
+              print("ERROR: Missing generated files compared to reference:")
+              for name in missing:
+                  print(f"  - {name}")
+              raise SystemExit(1)
+
+          if mismatches:
+              print("ERROR: Generated files differ from the reference data in tests/reference/single_species:")
+              for name, reason, max_rel in mismatches:
+                  if max_rel is None:
+                      print(f"  - {name}: {reason}")
+                  else:
+                      print(f"  - {name}: {reason} (max relative error: {max_rel:.2e})")
+              raise SystemExit(1)
+
+          print(f"OK: All {len(ref_files)} reference files match the BRNS output in {result_dir}")
+          PY
+
       - name: Upload executed notebook
         uses: actions/upload-artifact@v4
         with:
@@ -121,6 +201,87 @@ jobs:
           export PATH="$PWD/.ci-bin:$PATH"
           export BRNS_RESULT_DIR="$(cygpath -w "$PWD")\\build_output\\single_species_example\\results"
           jupyter nbconvert --to notebook --execute --ExecutePreprocessor.timeout=120 --output executed_plot_results.ipynb notebooks/plot_results.ipynb
+
+      - name: Validate BRNS output against reference
+        shell: msys2 {0}
+        env:
+          PYTHONUTF8: "1"
+          BRNS_RESULT_DIR: ${{ github.workspace }}/build_output/single_species_example/results
+          BRNS_REFERENCE_DIR: ${{ github.workspace }}/tests/reference/single_species
+        run: |
+          set -euo pipefail
+          python - "$BRNS_RESULT_DIR" "$BRNS_REFERENCE_DIR" <<'PY'
+          import sys
+          from pathlib import Path
+
+          import numpy as np
+
+          def load_numeric(path: Path):
+              try:
+                  return np.loadtxt(path)
+              except Exception:
+                  try:
+                      return np.loadtxt(path, skiprows=1)
+                  except Exception as exc:
+                      raise ValueError(f"Could not parse numeric data from {path}: {exc}") from exc
+
+          result_dir = Path(sys.argv[1])
+          reference_dir = Path(sys.argv[2])
+
+          if not result_dir.exists():
+              raise SystemExit(f"ERROR: Result directory not found: {result_dir}")
+
+          result_files = sorted(p for p in result_dir.iterdir() if p.is_file())
+          if not result_files:
+              raise SystemExit(f"ERROR: No generated BRNS result files found in {result_dir}")
+
+          ref_files = sorted(p for p in reference_dir.iterdir() if p.is_file())
+          if not ref_files:
+              raise SystemExit(f"ERROR: Reference directory is empty or missing: {reference_dir}")
+
+          missing = []
+          mismatches = []
+
+          for ref_path in ref_files:
+              target = result_dir / ref_path.name
+              if not target.exists():
+                  missing.append(ref_path.name)
+                  continue
+
+              try:
+                  ref_data = load_numeric(ref_path)
+                  res_data = load_numeric(target)
+              except ValueError as exc:
+                  raise SystemExit(f"ERROR: {exc}") from exc
+
+              if ref_data.shape != res_data.shape:
+                  mismatches.append((ref_path.name, "shape mismatch", None))
+                  continue
+
+              diff = np.abs(ref_data - res_data)
+              rel = diff / (np.abs(ref_data) + 1e-15)
+              max_rel = float(np.max(rel)) if rel.size else 0.0
+
+              if not np.allclose(ref_data, res_data, rtol=1e-8, atol=1e-12):
+                  mismatches.append((ref_path.name, "values differ", max_rel))
+
+          if missing:
+              print("ERROR: Missing generated files compared to reference:")
+              for name in missing:
+                  print(f"  - {name}")
+              raise SystemExit(1)
+
+          if mismatches:
+              print("ERROR: Generated files differ from the reference data in tests/reference/single_species:")
+              for name, reason, max_rel in mismatches:
+                  if max_rel is None:
+                      print(f"  - {name}: {reason}")
+                  else:
+                      print(f"  - {name}: {reason} (max relative error: {max_rel:.2e})")
+              raise SystemExit(1)
+
+          print(f"OK: All {len(ref_files)} reference files match the BRNS output in {result_dir}")
+          PY
 
       - name: Upload executed notebook
         uses: actions/upload-artifact@v4
