@@ -3,9 +3,9 @@
 # Flexible build script for BRNS examples
 # Automatically detects available examples from directory structure
 #
-# Usage: ./build_python.sh [EXAMPLE_NAME] [ACTION]
+# Usage: ./build_and_compare.sh [EXAMPLE_NAME] [ACTION]
 #   EXAMPLE_NAME: auto-detected or specific (e.g. single_species, multiple_species)
-#   ACTION: all (default), build, run, compare
+#   ACTION: all (default), codegen, build, build-compare, run, compare
 #
 
 set -e
@@ -66,14 +66,15 @@ if [ -z "$EXAMPLE" ]; then
         echo "  - $ex"
     done
     echo ""
-    echo "Usage: ./build_python.sh [EXAMPLE] [ACTION]"
+    echo "Usage: ./build_and_compare.sh [EXAMPLE] [ACTION]"
     echo "  EXAMPLE: $(IFS=', '; echo "${AVAILABLE_EXAMPLES[*]}")"
-    echo "  ACTION:  all (default), build, run, compare"
+    echo "  ACTION:  all (default), codegen, build, build-compare, run, compare"
     echo ""
     echo "Examples:"
-    echo "  ./build_python.sh single_species"
-    echo "  ./build_python.sh multiple_species build"
-    echo "  ./build_python.sh single_species run"
+    echo "  ./build_and_compare.sh single_species"
+    echo "  ./build_and_compare.sh multiple_species codegen"
+    echo "  ./build_and_compare.sh multiple_species build"
+    echo "  ./build_and_compare.sh single_species build-compare"
     echo ""
     exit 0
 fi
@@ -103,6 +104,7 @@ MODEL_DIR="$SCRIPT_DIR/models/$EXAMPLE"
 BUILD_BASE="$SCRIPT_DIR/build/$EXAMPLE"
 BUILD_REF="$BUILD_BASE/reference"
 BUILD_PY="$BUILD_BASE/python"
+CODEGEN_PY="$BUILD_BASE/generated"
 RESULTS_DIR="$BUILD_BASE/results"
 
 # ==========================================
@@ -137,6 +139,22 @@ detect_input_files() {
 
 INPUT_FILES=($(detect_input_files))
 
+detect_yaml_config() {
+    if [ ! -d "$MODEL_DIR" ]; then
+        return 1
+    fi
+
+    mapfile -t yaml_candidates < <(find "$MODEL_DIR" -maxdepth 1 -name "*.yaml" -type f | sort)
+
+    if [ ${#yaml_candidates[@]} -eq 0 ]; then
+        return 1
+    fi
+
+    printf '%s\n' "${yaml_candidates[0]}"
+}
+
+YAML_CONFIG="$(detect_yaml_config || true)"
+
 # ==========================================
 # Header
 # ==========================================
@@ -151,6 +169,11 @@ echo -e "${CYAN}Python-Gen:${NC}     $PYTHON_GEN"
 echo -e "${CYAN}Reference:${NC}      $REFERENCE_GEN"
 echo -e "${CYAN}Input files:${NC}    ${#INPUT_FILES[@]} found"
 echo -e "${CYAN}Action:${NC}         $ACTION"
+if [ -n "$YAML_CONFIG" ]; then
+    echo -e "${CYAN}YAML config:${NC}    $YAML_CONFIG"
+else
+    echo -e "${CYAN}YAML config:${NC}    not found"
+fi
 if [ "$RUN_TIMEOUT_SECONDS" -gt 0 ]; then
     echo -e "${CYAN}Timeout:${NC}        ${RUN_TIMEOUT_SECONDS}s"
 else
@@ -159,30 +182,27 @@ fi
 echo ""
 
 # ==========================================
-# Build function
+# Code generation and build preparation
 # ==========================================
 
-build_version() {
+prepare_build_directory() {
     local VERSION=$1
     local SOURCE=$2
     local TARGET=$3
-    local EXEC=$4
-    
+
     echo "=========================================="
-    echo "Build: $VERSION ($EXAMPLE)"
+    echo "Prepare Build Dir: $VERSION ($EXAMPLE)"
     echo "=========================================="
-    
+
     rm -rf "$TARGET"
     mkdir -p "$TARGET"
     cd "$TARGET"
-    
+
     echo "Copying framework..."
     cp "$FORTRAN_COMMON"/*.f . 2>/dev/null || true
     cp "$FORTRAN_COMMON"/*.F . 2>/dev/null || true
     cp "$FORTRAN_COMMON"/*.inc . 2>/dev/null || true
 
-    # Model-specific overrides from reference for Python build only
-    # (keeps reference branch unchanged and avoids pulling optimization files into Python compile set)
     if [ "$VERSION" = "Python" ] && [ -d "$REFERENCE_GEN" ]; then
         echo "Copying selected model-specific overrides from reference..."
         REFERENCE_OVERRIDES=(gridsetup.f advdiffcoeff.f porarea.f transcoeff.f transcoeff-MT.f)
@@ -193,28 +213,26 @@ build_version() {
             fi
         done
     fi
-    
+
     echo "Copying generated files..."
     cp "$SOURCE"/*.f . 2>/dev/null || true
     cp "$SOURCE"/*.F . 2>/dev/null || true
     cp "$SOURCE"/*.inc . 2>/dev/null || true
-    
-    echo "Fixing include paths (relative paths → local paths)..."
-    # Replace '../common_geo.inc' with 'common_geo.inc' etc.
+
+    echo "Fixing include paths (relative paths -> local paths)..."
     for f in *.f *.F; do
         if [ -f "$f" ]; then
             sed -i "s|include[[:space:]]*'../\([^']*\)'|include '\1'|gi" "$f" 2>/dev/null || true
             sed -i 's|include[[:space:]]*"../\([^"]*\)"|include "\1"|gi' "$f" 2>/dev/null || true
         fi
     done 2>/dev/null || true
-    
+
     echo "Copying input files (${#INPUT_FILES[@]})..."
     for inp in "${INPUT_FILES[@]}"; do
         if [ -f "$MODEL_DIR/$inp" ]; then
             cp "$MODEL_DIR/$inp" .
             echo "  ✓ $inp: $MODEL_DIR/$inp -> $TARGET/$inp"
         else
-            # Fallbacks if not present in models
             if [ -f "$REFERENCE_GEN/$inp" ]; then
                 cp "$REFERENCE_GEN/$inp" .
                 echo "  ⚠ $inp (fallback): $REFERENCE_GEN/$inp -> $TARGET/$inp"
@@ -226,10 +244,111 @@ build_version() {
             fi
         fi
     done
-    
+
     rm -f printsvnversion_nosvn.f printsvnversion_tmpl.f 2>/dev/null || true
 
-    # Compile only the forward-model source set (no optimization files)
+    echo ""
+    echo -e "${GREEN}✓ Build directory prepared${NC}"
+    echo ""
+}
+
+codegen_version() {
+    local python_cmd=""
+    local PYTHON_YAML_CONFIG="$YAML_CONFIG"
+    local PYTHON_YAML_DIR
+    local PYTHON_SCRIPT_DIR="$SCRIPT_DIR"
+
+    if [ -z "$YAML_CONFIG" ] || [ ! -f "$YAML_CONFIG" ]; then
+        echo -e "${RED}ERROR: No YAML config found for '$EXAMPLE' in $MODEL_DIR${NC}"
+        return 1
+    fi
+
+    if command -v python3 &>/dev/null; then
+        python_cmd="python3"
+    elif command -v python &>/dev/null; then
+        python_cmd="python"
+    else
+        echo -e "${RED}ERROR: python3/python not found!${NC}"
+        return 1
+    fi
+
+    echo "=========================================="
+    echo "Codegen: Python ($EXAMPLE)"
+    echo "=========================================="
+    echo ""
+
+    rm -rf "$CODEGEN_PY"
+    mkdir -p "$CODEGEN_PY"
+    cd "$CODEGEN_PY"
+
+    PYTHON_YAML_DIR="$(dirname "$YAML_CONFIG")"
+
+    if command -v cygpath &>/dev/null; then
+        PYTHON_YAML_CONFIG="$(cygpath -w "$YAML_CONFIG")"
+        PYTHON_YAML_DIR="$(cygpath -w "$PYTHON_YAML_DIR")"
+        PYTHON_SCRIPT_DIR="$(cygpath -w "$PYTHON_SCRIPT_DIR")"
+    fi
+
+    "$python_cmd" -c "
+import sys
+yaml_config, yaml_dir, script_dir = sys.argv[1:4]
+sys.path.insert(0, yaml_dir)
+sys.path.insert(0, script_dir)
+
+from acg_brns.acg_orchestrator import ACGOrchestrator
+
+try:
+    orchestrator = ACGOrchestrator(yaml_config, '.')
+    orchestrator.load_config()
+    print(f'✓ Loaded YAML: {orchestrator.config.get(\"model_name\", \"unknown\")}')
+
+    orchestrator.evaluate_formulas()
+    print('✓ Evaluated formulas')
+
+    orchestrator.map_to_acg_structures()
+    print('✓ Mapped to ACG structures')
+
+    orchestrator.run_preprocessing()
+    print('✓ Preprocessing completed')
+
+    orchestrator.run_code_generation()
+    print('✓ Fortran code generated')
+
+except Exception as e:
+    print(f'✗ Error: {e}', file=sys.stderr)
+    import traceback
+    traceback.print_exc()
+    sys.exit(1)
+" "$PYTHON_YAML_CONFIG" "$PYTHON_YAML_DIR" "$PYTHON_SCRIPT_DIR" || return 1
+
+    echo ""
+    if [ -d "$REFERENCE_GEN" ]; then
+        prepare_build_directory "Reference" "$REFERENCE_GEN" "$BUILD_REF"
+    fi
+    prepare_build_directory "Python" "$CODEGEN_PY" "$BUILD_PY"
+}
+
+# ==========================================
+# Build function
+# ==========================================
+
+build_version() {
+    local VERSION=$1
+    local TARGET=$2
+    local EXEC=$3
+
+    echo "=========================================="
+    echo "Build: $VERSION ($EXAMPLE)"
+    echo "=========================================="
+
+    if [ ! -d "$TARGET" ]; then
+        echo -e "${RED}ERROR: Build directory not found: $TARGET${NC}"
+        echo "  Run './build_and_compare.sh $EXAMPLE codegen' first."
+        return 1
+    fi
+
+    cd "$TARGET"
+
     CORE_SOURCES=(
         main.f
         basic.f biogeo.f boundaries.f drivervalues.f diagenesis.f
@@ -248,21 +367,19 @@ build_version() {
     done
 
     if [ ${#COMPILE_SOURCES[@]} -eq 0 ]; then
-        echo -e "${RED}ERROR: No Fortran sources selected for compilation!${NC}"
+        echo -e "${RED}ERROR: No Fortran sources selected for compilation in $TARGET!${NC}"
         return 1
     fi
-    
+
     echo ""
     echo "Compiling $EXEC..."
     echo "FFLAGS: $FFLAGS"
     echo "Source files: ${#COMPILE_SOURCES[@]}"
     echo ""
-    
-    # Compile and save exit code correctly (not overridden by tee)
+
     gfortran $FFLAGS "${COMPILE_SOURCES[@]}" -o "$EXEC" $LIBS 2>&1 | tee compile.log
     local COMPILE_STATUS=${PIPESTATUS[0]}
-    
-    # Check both exit code and if executable exists
+
     if [ $COMPILE_STATUS -eq 0 ] && [ -f "$EXEC" ]; then
         echo ""
         echo -e "${GREEN}✓ $VERSION compiled successfully${NC}"
@@ -348,7 +465,7 @@ run_version() {
         if [ $RUN_STATUS -eq 124 ]; then
             echo -e "${RED}✗ Execution interrupted due to timeout (${RUN_TIMEOUT_SECONDS}s)!${NC}"
             echo "  Hint: Partial .dat files may end differently."
-            echo "  Recommendation: RUN_TIMEOUT_SECONDS=0 ./build_python.sh $EXAMPLE run"
+            echo "  Recommendation: RUN_TIMEOUT_SECONDS=0 ./build_and_compare.sh $EXAMPLE run"
         else
             echo -e "${RED}✗ Execution failed!${NC}"
         fi
@@ -502,8 +619,9 @@ fi
 
 case "$ACTION" in
     all)
-        [ "$SKIP_REF" = false ] && build_version "Reference" "$REFERENCE_GEN" "$BUILD_REF" "brns_reference"
-        build_version "Python" "$PYTHON_GEN" "$BUILD_PY" "brns_python" || exit 1
+        codegen_version || exit 1
+        [ "$SKIP_REF" = false ] && build_version "Reference" "$BUILD_REF" "brns_reference"
+        build_version "Python" "$BUILD_PY" "brns_python" || exit 1
 
         [ "$SKIP_REF" = false ] && run_version "Reference" "$BUILD_REF" "brns_reference" "$RESULTS_DIR/reference"
         run_version "Python" "$BUILD_PY" "brns_python" "$RESULTS_DIR/python" || exit 1
@@ -515,9 +633,27 @@ case "$ACTION" in
         fi
         ;;
 
+    codegen)
+        codegen_version || exit 1
+        ;;
+
     build)
-        [ "$SKIP_REF" = false ] && build_version "Reference" "$REFERENCE_GEN" "$BUILD_REF" "brns_reference"
-        build_version "Python" "$PYTHON_GEN" "$BUILD_PY" "brns_python" || exit 1
+        [ "$SKIP_REF" = false ] && build_version "Reference" "$BUILD_REF" "brns_reference"
+        build_version "Python" "$BUILD_PY" "brns_python" || exit 1
+        ;;
+
+    build-compare)
+        [ "$SKIP_REF" = false ] && build_version "Reference" "$BUILD_REF" "brns_reference"
+        build_version "Python" "$BUILD_PY" "brns_python" || exit 1
+
+        [ "$SKIP_REF" = false ] && run_version "Reference" "$BUILD_REF" "brns_reference" "$RESULTS_DIR/reference"
+        run_version "Python" "$BUILD_PY" "brns_python" "$RESULTS_DIR/python" || exit 1
+
+        if [ "$SKIP_REF" = false ]; then
+            compare_results
+        else
+            echo -e "${YELLOW}Comparison not possible (no reference)${NC}"
+        fi
         ;;
 
     run)
@@ -535,7 +671,7 @@ case "$ACTION" in
 
     *)
         echo -e "${RED}Unknown action: $ACTION${NC}"
-        echo "Allowed: all, build, run, compare"
+        echo "Allowed: all, codegen, build, build-compare, run, compare"
         exit 1
         ;;
 esac
