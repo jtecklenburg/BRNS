@@ -42,7 +42,7 @@ nav:
         - "Literature": references.md
         - "YAML Model Reference": yaml_model_reference.md        
     - Developer:        
-        - "Developer pipeline": developer_pipeline.md
+        - "BRNS pipeline": developer_pipeline.md
         - "acg": api_acg.md
         - "gaussian_elimination": api_gaussian_elimination.md
         - "acg_orchestrator": api_acg_orchestrator.md
