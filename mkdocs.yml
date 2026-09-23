@@ -1,5 +1,5 @@
-site_name: BRNS
-site_description: "Biogeochemical Reaction Network Simulator"
+site_name: "BRNS - Biogeochemical Reaction Network Simulator"
+site_description: "BRNS - Biogeochemical Reaction Network Simulator"
 
 theme:
     name: "material"
