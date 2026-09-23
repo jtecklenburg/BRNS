@@ -59,7 +59,7 @@ c***********************************************************************
        write(*,*)
       write(*,*) '_________________________BRNS________________________'
       write(*,*) '               reactive transport model              '
-      write(*,*) '                   Version 2.0 - UFZ                 '
+      write(*,*) '                   Version 3.0 - BGR                 '
       write(*,*) '_____________________________________________________'
       write(*,*) '  contributers:                                      '
       write(*,*) '                                                     '
@@ -70,6 +70,8 @@ c***********************************************************************
       write(*,*) '                                                     '
       write(*,*) '  Florian Centler: Maple 10+ and DLL-versions        '
       write(*,*) '                                                     '
+      write(*,*) '  Jan Tecklenburg: Python-version                    '
+      write(*,*) '                                                     '      
       write(*,*) '  All Rights Reserved                                '
       write(*,*) '_____________________________________________________'
       write(*,*)
