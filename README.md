@@ -19,7 +19,7 @@ Since its introduction, BRNS and its derivatives have been applied to a wide ran
 - Early diagenesis and redox cycling of carbon, nitrogen, iron, manganese and sulfur in marine sediments and groundwater [Thullner et al., 2005]
 - pH dynamics and proton budgets in aquatic sediments [Jourabchi et al., 2005]
 - Anaerobic oxidation of methane (AOM) and sulfate-methane transition zones [Blouet et al., 2021]
-- Methane hydrate stability and benthic methane escape under permafrost thaw [Sivan et al., 2020]
+- Methane hydrate stability and benthic methane escape under permafrost thaw [Puglini et al., 2020]
 - Coupling with multidimensional flow and transport codes (e.g. OpenGeoSys, OpenFOAM) for groundwater and pore-scale reactive transport [Centler et al., 2010; Golparvar et al., 2024]
 - Stable isotope fractionation due to reactive and transport processes [Centler et al., 2013; Khan et al., 2018]
 
