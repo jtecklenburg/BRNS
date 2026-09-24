@@ -250,7 +250,7 @@ This project builds upon the work and concepts of several contributors:
 - Florian Centler: Maple 10+ and DLL versions.
 - Jan Tecklenburg: Python version implementation.
 
-The development of the Python-based version of BRNS was funded by the German Federal Ministry for Research, Technology and Space (BMFTR) under the funding initiative 'Geoforschung und Nachhaltigkeit' (GEO:N), grant number 03G0937B. The project was administered by the Project Management Jülich (PtJ).
+The development of the Python-based version of BRNS was funded by the German Federal Ministry for Research, Technology and Space (BMFTR) under the funding initiative 'Geoforschung und Nachhaltigkeit' (GEO:N), grant number 03G0937B (ThermoOptiPlan). The project was administered by the Project Management Jülich (PtJ).
 
 ## License
 

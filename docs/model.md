@@ -1,6 +1,6 @@
 # Model description
 
-The Biogeochemical Reaction Network Simulator (BRNS) represents biogeochemical and reactive transport dynamics in porous media by solving a set of coupled, one-dimensional mass conservation equations for dissolved and solid species along a depth-resolved domain. Transport of solutes and particles is described through a combination of molecular diffusion, advection (e.g., sediment burial or groundwater flow), bioturbation, and bioirrigation, while local concentration changes due to biogeochemical transformations are represented by a user-defined network of kinetic and equilibrium reactions.
+The Biogeochemical Reaction Network Simulator (BRNS) represents biogeochemical and reactive transport dynamics in porous media by solving a set of coupled, one-dimensional mass conservation equations for dissolved and solid species along a depth-resolved domain. Transport of solutes and particles is described through a combination of molecular diffusion, advection (e.g., sediment burial or groundwater flow), and bioturbation, while local concentration changes due to biogeochemical transformations are represented by a user-defined network of kinetic and equilibrium reactions.
 
 ## Governing equation
 
@@ -10,7 +10,7 @@ $$
 \frac{\partial C_k}{\partial t} = -v_k\frac{\partial C_k}{\partial x} + \frac{\partial}{\partial x}\left(D_k\frac{\partial C_k}{\partial x}\right) + R_k(\mathbf{C},x,t).
 $$
 
-Here, $C_k$ is the component concentration, $v_k$ is its effective advective velocity, $D_k$ is its total dispersion coefficient, and $R_k$ is the net production rate defined by the generated reaction network. The model distinguishes dissolved and solid components. Dissolved components use $v_k=v_d=w+q/(\phi A)$; solid components use $v_k=v_s=w$. The transport step uses the spatially variable $v_k$ and $D_k$ specified at grid faces. Components marked as non-transported are excluded from the transport step.
+Here, $C_k$ is the component concentration, $v_k$ is its effective advective velocity, $D_k$ is its total dispersion coefficient, and $R_k$ is the net production rate defined by the generated reaction network. The model distinguishes dissolved and solid components. Dissolved components use $v_k=v_d=w+q/(\phi A)$; solid components use $v_k=v_s=w$. The transport step uses the variable $v_k$ and $D_k$ specified at grid faces. Components marked as non-transported are excluded from the transport step.
 
 For dissolved components, the implemented coefficient is
 
@@ -58,7 +58,7 @@ For a fixed-concentration boundary, the specified concentration is retained duri
 
 ## Numerical solution
 
-Transport and reaction are coupled by sequential operator splitting. Each time step first calculates transport for every component and then calculates the reaction network separately at every concentration location. The local nonlinear reaction system is solved by Newton iteration with relaxation. Each Newton correction is obtained by LU decomposition of the reaction Jacobian. The initial time-step length is read from the model input and is subsequently adapted from the temporal curvature of a selected master component.
+Transport and reaction are coupled by sequential operator splitting. Each time step first calculates transport for every component and then calculates the reaction network separately at every concentration location. The local nonlinear reaction system is solved by Newton iteration with relaxation. Each Newton correction is obtained by LU decomposition of the reaction Jacobian. The initial time-step length is read from the model input.
 
 Transport is discretized implicitly with finite differences. Each equation couples a concentration point to its two neighbours. This produces a tridiagonal linear system, which is solved by the Thomas algorithm for tridiagonal systems.
 
