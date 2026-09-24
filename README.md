@@ -105,6 +105,11 @@ units:
   M: arbitrary
   T: a
 
+output:
+  timing:
+    start: 50.0
+    interval: 5000.0
+
 grid:
   nnodes: 51
   type: 0
@@ -115,6 +120,8 @@ initial_conditions:
 species:
   - name: species_a
     type: dissolved
+    output: true
+    output_filename: species_a
     bc_upper_type: 0
     bc_upper_value: 1.0
     bc_lower_type: 1
@@ -124,6 +131,8 @@ species:
 
   - name: species_b
     type: dissolved
+    output: true
+    output_filename: species_b
     bc_upper_type: 0
     bc_upper_value: 0.0
     bc_lower_type: 1
@@ -134,17 +143,33 @@ species:
 parameters:
   kinetics:
     k_ref: 1.0e-3
-    k: "2*k_ref"
+    k_is: "2*k_ref"
   physical:
+    al: 0.01
+    q0: 0.0
     w0: 1.0e-4
+    Db0: 0.0
     por0: 0.3
+    area0: 1.0
+    t_celsius: 0.1
+    salin: 0.1
     depthmax: 0.1
     delt: 10.0
-    endt: 1.0e4
+    endt: 1.0e5
+  physical_flags:
+    iq: 0
+    iw: 0
+    iDb: 0
+    ipor: 0
+    igrid: 0
+    iarea: 0
 
 reactions:
   - id: 1
-    rate: "k*a"
+    name: species_a_to_species_b
+    output: true
+    output_filename: rate_ab
+    rate: "k_is*species_a"
     stoichiometry: {species_a: -1, species_b: 1}
 ```
 
