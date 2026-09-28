@@ -1,6 +1,6 @@
 # BRNS – Biogeochemical Reaction Network Simulator
 
-![GitHub License](https://img.shields.io/github/license/jtecklenburg/BRNS)
+![GitHub License](https://img.shields.io/github/license/jtecklenburg/BRNS)[![https://doi.org/10.25928/c8q5-bq12](https://img.shields.io/badge/DOI-10.25928%2Fc8q5-bq12?color=blue)](https://doi.org/10.25928/c8q5-bq12)
 
 BRNS (**Biogeochemical Reaction Network Simulator**) is a flexible modelling framework for simulating coupled, multi-component reaction networks in porous media. It combines an automatic code generator (ACG) with a compiled Fortran simulation core, allowing to define arbitrarily complex kinetic and equilibrium reaction networks without hand-writing solver code for every new problem.
 
