@@ -21,7 +21,7 @@ from acg_brns.acg_orchestrator import ACGOrchestrator
 ROOT = Path(__file__).resolve().parent
 
 # Default paths, used when no command-line arguments are given.
-YAML_PATH = ROOT / "models" / "minimal" / "simple.yaml"
+YAML_PATH = ROOT / "models" / "simple" / "simple.yaml"
 OUTPUT_DIR = ROOT / "generated_fortran" / "simple"
 
 # To hard-code different defaults instead of using the command line, edit the
