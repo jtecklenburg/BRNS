@@ -59,7 +59,7 @@ c***********************************************************************
        write(*,*)
       write(*,*) '_________________________BRNS________________________'
       write(*,*) '               reactive transport model              '
-      write(*,*) '                   Version 3.0 - BGR                 '
+      write(*,*) '                   Version 3.0                       '
       write(*,*) '_____________________________________________________'
       write(*,*) '  contributers:                                      '
       write(*,*) '                                                     '
@@ -68,7 +68,7 @@ c***********************************************************************
       write(*,*) '  Florian Centler, Martin Thullner:                  '
       write(*,*) '                coupling and generalization concept  '
       write(*,*) '                                                     '
-      write(*,*) '  Florian Centler: Maple 10+ and DLL-versions        '
+      write(*,*) '  Florian Centler: DLL-versions        '
       write(*,*) '                                                     '
       write(*,*) '  Jan Tecklenburg: Python-version                    '
       write(*,*) '                                                     '      
