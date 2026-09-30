@@ -1,5 +1,5 @@
 c    $Id: getdelt.f 16 2007-10-18 12:36:47Z centler $
-  include 'inittimestep.inc'
+      include 'inittimestep.inc'
 
       subroutine getdelt(nt,time,tend,spg)
 
